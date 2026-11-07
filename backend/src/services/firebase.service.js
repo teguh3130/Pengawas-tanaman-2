@@ -38,7 +38,18 @@ function initFirebase() {
     if (saJson) {
       serviceAccount = JSON.parse(saJson);
     } else if (saPath) {
-      const resolvedPath = path.resolve(saPath);
+      let resolvedPath = path.resolve(saPath);
+      if (!fs.existsSync(resolvedPath)) {
+        // Coba cari di dalam folder backend/ jika dijalankan dari root
+        const altPath1 = path.resolve(process.cwd(), 'backend', saPath);
+        const altPath2 = path.resolve(__dirname, '../../', saPath);
+        if (fs.existsSync(altPath1) && fs.statSync(altPath1).isFile()) {
+          resolvedPath = altPath1;
+        } else if (fs.existsSync(altPath2) && fs.statSync(altPath2).isFile()) {
+          resolvedPath = altPath2;
+        }
+      }
+
       if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isFile()) {
         serviceAccount = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
       } else {

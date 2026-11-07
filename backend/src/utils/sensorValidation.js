@@ -83,8 +83,9 @@ function validateSensorPayload(data) {
   checkField('soilMoistureRaw', data.soilMoistureRaw, PHYSICAL_RANGES.soilMoistureRaw);
   checkField('lightLux',        data.lightLux,        PHYSICAL_RANGES.lightLux);
 
-  // timestamp wajib ada dan berupa angka positif
-  if (data.timestamp && !isNaN(Number(data.timestamp)) && Number(data.timestamp) > 0) {
+  // timestamp wajib ada, berupa angka positif, dan realistis (minimal tahun 2020)
+  // Menghindari perbedaan epoch MicroPython (tahun 2000) vs Unix (tahun 1970)
+  if (data.timestamp && !isNaN(Number(data.timestamp)) && Number(data.timestamp) > 1577836800000) {
     fields.timestamp = Number(data.timestamp);
   } else {
     // Gunakan server timestamp jika tidak ada / tidak valid
