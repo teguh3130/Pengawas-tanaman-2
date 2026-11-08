@@ -1,59 +1,61 @@
 """
-config.py — Konfigurasi Hardware, Jaringan & Keamanan ESP32
+config.py — Konfigurasi Cerdas & Multi-Jaringan ESP32
 Sistem Pengawas Tanaman IoT
 ===========================================================
-Isi parameter di bawah ini sesuai dengan jaringan WiFi dan alamat IP PC Backend Anda.
+Fitur Auto-Detect:
+- Multi-WiFi: Mendukung banyak Wi-Fi sekaligus (otomatis memilih yang sinyalnya ada).
+- Multi-Backend: Otomatis mendeteksi backend yang sedang aktif (Cloud Hostingin vs Laptop Lokal).
+- Tidak perlu gonta-ganti kode lagi saat berpindah lokasi / jaringan.
 """
 
 # ==============================================================================
-# 1. KONFIGURASI JARINGAN & BACKEND API
+# 1. DAFTAR JARINGAN WI-FI (Multi-WiFi Auto-Connect)
 # ==============================================================================
-# Nama SSID dan Password WiFi 2.4GHz Anda
-WIFI_SSID = "t"
-WIFI_PASSWORD = "88888888"
+# ESP32 akan memindai sinyal dan otomatis menyambung ke Wi-Fi yang tersedia.
+# Anda bisa menambahkan Wi-Fi rumah, kantor, atau hotspot di sini.
+WIFI_NETWORKS = [
+    ("Free Wifi", "podokoyokwingi"),   # Wi-Fi Lokasi Sekarang
+    ("GUDANG SKP", "Bismillah123"),   # Wi-Fi Kantor / Gudang
+    ("t", "88888888"),                # Hotspot HP
+]
 
-# Alamat IP Komputer/Server Backend (Gunakan IP lokal laptop/PC di jaringan WiFi yang sama)
-# CATATAN: JANGAN gunakan 'localhost' atau '127.0.0.1' karena ESP32 adalah perangkat terpisah.
-# IP Laptop Anda saat ini (di hotspot): 10.53.118.175
-BACKEND_URL = "http://10.53.118.175:3001"
+# ==============================================================================
+# 2. DAFTAR TARGET BACKEND API (Auto-Discovery Failover)
+# ==============================================================================
+# ESP32 akan otomatis menguji dan memilih server yang sedang ONLINE.
+# Jika Server Cloud aktif, ESP32 pakai Cloud. Jika mati, beralih ke Laptop lokal!
+BACKEND_TARGETS = [
+    "http://144.79.202.196:40051",   # 1. Server Cloud Hostingin (Utama - Cloud)
+    "http://192.168.0.106:3001",      # 2. IP Laptop saat di Wi-Fi Free Wifi
+    "http://192.168.1.14:3001",       # 3. IP Laptop saat di Wi-Fi GUDANG SKP
+    "http://10.53.118.175:3001",      # 4. IP Laptop saat di Hotspot HP (t)
+]
 
-# Device Bearer Token untuk autentikasi ke backend (harus sama dengan ESP32_DEVICE_TOKEN di backend/.env)
+# Device Bearer Token untuk autentikasi ke backend (sama dengan ESP32_DEVICE_TOKEN di backend/.env)
 DEVICE_TOKEN = "8192736489273994765284626878796452804837"
 
 # ==============================================================================
-# 2. KONFIGURASI PIN HARDWARE (ESP32 DevKit V1 30-Pin)
+# 3. KONFIGURASI PIN HARDWARE (ESP32 DevKit V1 30-Pin)
 # ==============================================================================
-PIN_DHT22 = 27          # GPIO 27 (Digital Input/Output untuk DHT22 Data)
-PIN_SOIL_ADC = 34       # GPIO 34 (ADC1 Channel 6, Input-Only untuk Soil Moisture AO)
-PIN_I2C_SDA = 21        # GPIO 21 (Hardware I2C Data untuk BH1750)
-PIN_I2C_SCL = 22        # GPIO 22 (Hardware I2C Clock untuk BH1750)
-BH1750_I2C_ADDR = 0x23  # Alamat default I2C sensor BH1750 (0x23 jika pin ADDR ke GND)
+PIN_DHT22 = 27          # GPIO 27 (Digital Data DHT22)
+PIN_SOIL_ADC = 34       # GPIO 34 (ADC1 Channel 6, Input-Only Analog Soil Moisture)
+PIN_I2C_SDA = 21        # GPIO 21 (Hardware/Soft I2C Data BH1750)
+PIN_I2C_SCL = 22        # GPIO 22 (Hardware/Soft I2C Clock BH1750)
+BH1750_I2C_ADDR = 0x23  # Alamat I2C BH1750 (Auto-scan 0x23 / 0x5C)
 
-PIN_RELAY = 26          # GPIO 26 (Digital Output untuk kendali modul Relay pompa)
-
-# ==============================================================================
-# 3. KONFIGURASI LOGIKA RELAY & PENGAMANAN POMPA 12V
-# ==============================================================================
-# Mayoritas modul relay mekanik bersifat Active LOW:
-# - Active LOW  : Nilai 0 (LOW) = Relay ON (Pompa Hidup), 1 (HIGH) = Relay OFF (Pompa Mati)
-# - Active HIGH : Nilai 1 (HIGH) = Relay ON (Pompa Hidup), 0 (LOW) = Relay OFF (Pompa Mati)
-RELAY_ACTIVE_LOW = True
-
-# Batas Durasi Maksimal Pompa Menyala Terus Menerus (Detik)
-# Pengaman jika perintah STOP terlambat diterima atau sistem freeze agar tanaman tidak kebanjiran.
-MAX_PUMP_RUN_SEC = 20
-
-# Durasi Cooldown Minimal (Detik) setelah pompa mati sebelum boleh diaktifkan lagi
-PUMP_COOLDOWN_SEC = 30
-
-# Fail-safe Timeout (Detik): Jika ESP32 kehilangan koneksi ke backend saat pompa ON,
-# matikan relay secara otomatis setelah batas waktu ini.
-FAILSAFE_TIMEOUT_SEC = 15
+PIN_RELAY = 26          # GPIO 26 (Digital Output Relay Pompa 12V)
 
 # ==============================================================================
-# 4. INTERVAL LOOP (DETIK)
+# 4. KONFIGURASI PENGAMANAN HARDWARE RELAY & POMPA
 # ==============================================================================
-SENSOR_SEND_INTERVAL_SEC = 5   # Interval pengiriman data sensor ke POST /api/sensor
-PUMP_POLL_INTERVAL_SEC = 3     # Interval polling perintah pompa ke GET /api/pump/state
-HTTP_TIMEOUT_SEC = 6           # Timeout per HTTP request
+RELAY_ACTIVE_LOW = True     # True jika relay menyala saat pin LOW (0)
+MAX_PUMP_RUN_SEC = 20       # Durasi maksimal pompa menyala terus menerus (detik)
+PUMP_COOLDOWN_SEC = 30      # Jeda waktu minimal sebelum pompa boleh diaktifkan lagi (detik)
+FAILSAFE_TIMEOUT_SEC = 15   # Jika hilang koneksi backend saat pompa ON, matikan otomatis (detik)
 
+# ==============================================================================
+# 5. INTERVAL TIMER (DETIK)
+# ==============================================================================
+SENSOR_SEND_INTERVAL_SEC = 5   # Interval pengiriman data sensor ke backend
+PUMP_POLL_INTERVAL_SEC = 3     # Interval polling perintah pompa
+HTTP_TIMEOUT_SEC = 4           # Timeout per HTTP request

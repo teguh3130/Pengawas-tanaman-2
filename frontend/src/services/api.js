@@ -5,7 +5,7 @@
  * Seluruh komunikasi frontend melewati backend ini (tidak mengakses database langsung).
  */
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://144.79.202.196:40051';
 
 /**
  * Helper fetch dengan timeout dan parsing JSON terpadu.
