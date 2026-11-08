@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePlant } from '../context/PlantContext';
-import { Droplets, Clock, CheckCircle2, History } from 'lucide-react';
+import { History, Droplets } from 'lucide-react';
 
 export function WateringHistory() {
   const { wateringHistory } = usePlant();
@@ -9,78 +9,79 @@ export function WateringHistory() {
     <div className="card">
       <div className="card-header">
         <div className="card-title">
-          <History size={18} style={{ color: 'var(--plant-green)' }} />
-          <span>Riwayat Aktivitas Penyiraman</span>
+          <History size={16} style={{ color: 'var(--plant-green)' }} />
+          <span>Log Aktivitas Irigasi & Aktuator</span>
         </div>
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          {wateringHistory.length} catatan
+        <span className="mono" style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
+          {wateringHistory.length} Sesi Tercatat
         </span>
       </div>
 
       {wateringHistory.length === 0 ? (
         <div
           style={{
-            padding: '30px 20px',
+            padding: '28px 16px',
             textAlign: 'center',
             color: 'var(--text-muted)',
-            fontSize: '0.85rem',
+            fontSize: '0.8125rem',
           }}
         >
-          <Droplets size={28} style={{ opacity: 0.3, marginBottom: '8px' }} />
-          <div>Belum ada riwayat aktivasi pompa.</div>
-          <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
-            Pompa akan dicatat otomatis saat mode manual atau otomatis menyala.
+          <Droplets size={22} style={{ opacity: 0.3, marginBottom: '6px' }} />
+          <div style={{ fontWeight: 600 }}>Belum ada log penyiraman tercatat</div>
+          <div style={{ fontSize: '0.725rem', marginTop: '2px', color: 'var(--text-dim)' }}>
+            Setiap aktivasi pompa (manual maupun otomatis) otomatis terarsip dalam tabel ini.
           </div>
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.825rem' }}>
+          <table className="data-table">
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)', textAlign: 'left' }}>
-                <th style={{ padding: '8px 10px' }}>Waktu Mulai</th>
-                <th style={{ padding: '8px 10px' }}>Mode</th>
-                <th style={{ padding: '8px 10px' }}>Durasi</th>
-                <th style={{ padding: '8px 10px' }}>Alasan / Pemicu</th>
-                <th style={{ padding: '8px 10px' }}>Kelembapan</th>
+              <tr>
+                <th>Timestamp</th>
+                <th>Mode</th>
+                <th>Durasi</th>
+                <th>Pemicu / Alasan</th>
+                <th>Kondisi Tanah</th>
               </tr>
             </thead>
             <tbody>
               {wateringHistory.map((item, idx) => {
                 const dateStr = item.startedAt
                   ? new Date(item.startedAt).toLocaleString('id-ID', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
                   : '-';
                 const isAuto = item.mode === 'auto';
                 return (
-                  <tr
-                    key={item.key || idx}
-                    style={{
-                      borderBottom: '1px solid var(--border-subtle)',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    <td style={{ padding: '10px 10px', color: 'var(--text-primary)' }}>{dateStr}</td>
-                    <td style={{ padding: '10px 10px' }}>
+                  <tr key={item.key || idx}>
+                    <td className="mono" style={{ color: 'var(--text-primary)' }}>{dateStr}</td>
+                    <td>
                       <span
-                        className="badge"
                         style={{
-                          fontSize: '0.7rem',
-                          background: isAuto ? 'rgba(99, 102, 241, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                          color: isAuto ? '#a5b4fc' : '#6ee7b7',
+                          fontSize: '0.6875rem',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                          padding: '2px 6px',
+                          borderRadius: 'var(--radius-xs)',
+                          background: isAuto ? 'var(--status-info-bg)' : 'var(--plant-green-muted)',
+                          color: isAuto ? 'var(--status-info)' : 'var(--plant-green)',
+                          border: `1px solid ${isAuto ? 'var(--status-info-border)' : 'var(--plant-green-border)'}`,
                         }}
                       >
                         {item.mode || 'manual'}
                       </span>
                     </td>
-                    <td style={{ padding: '10px 10px', fontFamily: 'var(--font-mono)' }}>
-                      {item.durationSec ? `${item.durationSec}s` : 'Sedang jalan'}
+                    <td className="mono">
+                      {item.durationSec ? `${item.durationSec}s` : 'Aktif'}
                     </td>
-                    <td style={{ padding: '10px 10px' }}>{item.triggerReason || 'manual'}</td>
-                    <td style={{ padding: '10px 10px' }}>
+                    <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {item.triggerReason || 'Operator Trigger'}
+                    </td>
+                    <td className="mono" style={{ color: 'var(--soil-cyan)', fontWeight: 600 }}>
                       {item.soilAfter !== null && item.soilAfter !== undefined
                         ? `${item.soilAfter}%`
                         : '-'}
@@ -97,4 +98,3 @@ export function WateringHistory() {
 }
 
 export default WateringHistory;
-

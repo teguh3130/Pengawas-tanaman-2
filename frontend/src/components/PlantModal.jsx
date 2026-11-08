@@ -84,7 +84,7 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
               <Sprout size={20} />
             </div>
             <div>
-              <h2 style={{ fontSize: '1.15rem', color: '#fff' }}>Konfigurasi Tanaman</h2>
+              <h2 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: 700 }}>Konfigurasi Tanaman</h2>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Tentukan informasi tanaman yang diawasi oleh sistem IoT
               </p>

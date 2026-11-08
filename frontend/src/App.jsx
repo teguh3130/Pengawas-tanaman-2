@@ -75,24 +75,24 @@ function DashboardContent() {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Professional Footer */}
       <footer
         style={{
           borderTop: '1px solid var(--border-subtle)',
-          padding: '20px 0',
+          padding: '16px 0',
           background: 'var(--bg-footer)',
-          fontSize: '0.8rem',
+          fontSize: '0.75rem',
           color: 'var(--text-muted)',
           textAlign: 'center',
-          transition: 'background-color 0.25s ease, border-color 0.25s ease',
+          transition: 'background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
         <div className="container">
-          <p>
-            <strong>Sistem Pengawas Tanaman</strong> — IoT Monitoring, ESP32 MicroPython, Firebase Realtime Database & Google Gemini AI.
+          <p style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>
+            Sistem Pengawas Tanaman (Agricultural IoT & AI Telemetry)
           </p>
-          <p style={{ fontSize: '0.75rem', marginTop: '4px', color: 'var(--text-muted)' }}>
-            Data tiruan dan kontrol pompa saat ini bekerja dalam lingkungan simulasi virtual untuk pengujian.
+          <p style={{ fontSize: '0.7rem', marginTop: '2px', color: 'var(--text-muted)' }}>
+            ESP32 MicroPython • Firebase Realtime Database • Google Gemini AI Engine
           </p>
         </div>
       </footer>

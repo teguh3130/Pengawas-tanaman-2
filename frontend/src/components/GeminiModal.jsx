@@ -135,28 +135,27 @@ export function GeminiModal({ isOpen, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" style={{ maxWidth: '780px' }} onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                color: '#fff',
+                width: '38px',
+                height: '38px',
+                borderRadius: 'var(--radius-sm)',
+                background: '#4f46e5',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)',
               }}
             >
-              <Sparkles size={22} />
+              <Sparkles size={20} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h2 style={{ fontSize: '1.2rem', color: '#fff' }}>Rekomendasi Gemini AI</h2>
+                <h2 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: 700 }}>Rekomendasi Gemini AI</h2>
                 <span
                   style={{
                     fontSize: '0.7rem',
@@ -272,17 +271,17 @@ export function GeminiModal({ isOpen, onClose }) {
             {/* Recommendation Cards */}
             {requirements ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                
+
                 {/* 4 Metrics Summary Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
-                  
+
                   {/* Kelembapan Tanah */}
                   <div style={{ background: 'rgba(20, 184, 166, 0.08)', border: '1px solid rgba(20, 184, 166, 0.25)', borderRadius: '12px', padding: '14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--soil-cyan)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
                       <Waves size={16} />
                       <span>Kelembapan Tanah</span>
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {requirements.soilMoisture?.ideal ? `${requirements.soilMoisture.ideal.min}–${requirements.soilMoisture.ideal.max}%` : '-'}
                     </div>
                     <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -291,12 +290,12 @@ export function GeminiModal({ isOpen, onClose }) {
                   </div>
 
                   {/* Suhu */}
-                  <div style={{ background: 'rgba(249, 115, 22, 0.08)', border: '1px solid rgba(249, 115, 22, 0.25)', borderRadius: '12px', padding: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--temp-orange)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
+                  <div style={{ background: 'var(--temp-amber-muted)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--temp-amber)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
                       <Thermometer size={16} />
                       <span>Suhu Udara</span>
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {requirements.temperature?.ideal ? `${requirements.temperature.ideal.min}–${requirements.temperature.ideal.max}°C` : '-'}
                     </div>
                     <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -305,12 +304,12 @@ export function GeminiModal({ isOpen, onClose }) {
                   </div>
 
                   {/* Kelembapan Udara */}
-                  <div style={{ background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.25)', borderRadius: '12px', padding: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--humid-blue)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
+                  <div style={{ background: 'var(--humid-sky-muted)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--humid-sky)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
                       <Droplets size={16} />
                       <span>Kelembapan Udara</span>
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {requirements.airHumidity?.ideal ? `${requirements.airHumidity.ideal.min}–${requirements.airHumidity.ideal.max}%` : '-'}
                     </div>
                     <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -319,12 +318,12 @@ export function GeminiModal({ isOpen, onClose }) {
                   </div>
 
                   {/* Cahaya */}
-                  <div style={{ background: 'rgba(234, 179, 8, 0.08)', border: '1px solid rgba(234, 179, 8, 0.25)', borderRadius: '12px', padding: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--light-yellow)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
+                  <div style={{ background: 'var(--light-gold-muted)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--light-gold)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
                       <Sun size={16} />
                       <span>Cahaya Harian</span>
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {requirements.light?.dailyDurationHours ? `${requirements.light.dailyDurationHours} Jam/Hari` : '-'}
                     </div>
                     <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -336,8 +335,8 @@ export function GeminiModal({ isOpen, onClose }) {
 
                 {/* Penjelasan Deskriptif Gemini */}
                 {requirements.description && (
-                  <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '14px 18px', borderRadius: '10px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                    <strong style={{ color: '#fff' }}>Karakteristik Tanaman:</strong> {requirements.description}
+                  <div style={{ background: 'var(--bg-card-subtle)', border: '1px solid var(--border-subtle)', padding: '14px 18px', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <strong style={{ color: 'var(--text-primary)' }}>Karakteristik Tanaman:</strong> {requirements.description}
                   </div>
                 )}
 
@@ -374,7 +373,7 @@ export function GeminiModal({ isOpen, onClose }) {
               /* Belum ada requirements */
               <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
                 <Bot size={40} style={{ opacity: 0.4, marginBottom: '12px' }} />
-                <div style={{ fontSize: '0.95rem', color: '#fff', fontWeight: 600, marginBottom: '6px' }}>
+                <div style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '6px' }}>
                   Belum Ada Rekomendasi AI
                 </div>
                 <div style={{ fontSize: '0.825rem', maxWidth: '420px', margin: '0 auto 20px auto' }}>

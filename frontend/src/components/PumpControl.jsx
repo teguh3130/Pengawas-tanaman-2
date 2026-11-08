@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePlant } from '../context/PlantContext';
-import { Power, ToggleLeft, ToggleRight, ShieldAlert, Cpu, CheckCircle, Clock, Droplets, Info } from 'lucide-react';
+import { Power, Cpu, Droplets, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export function PumpControl() {
   const { pump, togglePump, changePumpMode, isSimulator } = usePlant();
@@ -10,7 +10,7 @@ export function PumpControl() {
   const mode = pump?.mode || 'manual';
   const isAuto = mode === 'auto';
 
-  // Perbedaan Command vs Status Fisik
+  // Perbedaan Command Logic vs Status Relay Fisik
   const commandVal = Boolean(pump?.command?.value);
   const relayStatus = Boolean(pump?.status?.relayOn);
 
@@ -39,210 +39,171 @@ export function PumpControl() {
   };
 
   return (
-    <div className="card" style={{ marginBottom: '24px' }}>
-      
+    <div className="card" style={{ marginBottom: '20px' }}>
+
       {/* Header */}
       <div className="card-header">
         <div className="card-title">
-          <Droplets size={20} style={{ color: 'var(--humid-blue)' }} />
-          <span>Kendali Pompa Penyiraman</span>
+          <Droplets size={16} style={{ color: 'var(--plant-green)' }} />
+          <span>Kendali Aktuator Pompa</span>
         </div>
-        
-        {/* Mode Selector Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-card-subtle)', border: '1px solid var(--border-subtle)', padding: '3px', borderRadius: '8px' }}>
+
+        {/* Mode Switcher Segmented */}
+        <div className="segmented-control">
           <button
+            type="button"
             onClick={() => handleModeSwitch('manual')}
             disabled={isUpdating}
-            style={{
-              background: !isAuto ? 'var(--plant-green)' : 'transparent',
-              color: !isAuto ? '#ffffff' : 'var(--text-secondary)',
-              border: 'none',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
+            className={`segmented-btn ${!isAuto ? 'active' : ''}`}
           >
             Manual
           </button>
           <button
+            type="button"
             onClick={() => handleModeSwitch('auto')}
             disabled={isUpdating}
-            style={{
-              background: isAuto ? '#6366f1' : 'transparent',
-              color: isAuto ? '#ffffff' : 'var(--text-secondary)',
-              border: 'none',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
+            className={`segmented-btn ${isAuto ? 'active' : ''}`}
           >
             Otomatis
           </button>
         </div>
       </div>
 
-      {/* Simulation Warning Note */}
-      <div
-        style={{
-          background: 'rgba(245, 158, 11, 0.08)',
-          border: '1px solid rgba(245, 158, 11, 0.25)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '10px 14px',
-          marginBottom: '16px',
-          fontSize: '0.8rem',
-          color: 'var(--text-primary)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
-      >
-        <Info size={16} style={{ flexShrink: 0, color: 'var(--status-warning)' }} />
-        <span>
-          <strong>Tahap Simulasi:</strong> Tombol kendali di bawah ini memicu simulator virtual. Relay dan pompa 12V fisik belum terhubung ke sistem.
-        </span>
-      </div>
-
       {actionError && (
         <div
           style={{
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
+            background: 'var(--status-crit-bg)',
+            border: '1px solid var(--status-crit-border)',
             borderRadius: 'var(--radius-sm)',
             padding: '8px 12px',
             marginBottom: '14px',
-            fontSize: '0.825rem',
-            color: 'var(--status-danger)',
+            fontSize: '0.8rem',
+            color: 'var(--status-crit)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          {actionError}
+          <AlertCircle size={15} style={{ flexShrink: 0 }} />
+          <span>{actionError}</span>
         </div>
       )}
 
-      {/* Main Status & Controls Area */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
-        
-        {/* Box 1: Perintah Sistem (Command) */}
-        <div
-          style={{
-            background: 'var(--bg-card-subtle)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-            Perintah Pengguna / AI:
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <span
-              style={{
-                fontSize: '1.25rem',
-                fontWeight: 800,
-                color: commandVal ? 'var(--plant-green)' : 'var(--text-muted)',
-              }}
-            >
-              {commandVal ? 'MENYALA (ON)' : 'MATI (OFF)'}
-            </span>
-          </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Dikeluarkan oleh: <strong>{pump?.command?.issuedBy || 'user'}</strong>
-          </div>
-        </div>
+      {/* Industrial Operational Matrix: Relay Hardware vs Logic Command */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
 
-        {/* Box 2: Status Relay Fisik/Virtual (Status) */}
+        {/* Box 1: Status Relay Aktual (Hardware State) */}
         <div
           style={{
             background: 'var(--bg-card-subtle)',
             border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            borderRadius: 'var(--radius-sm)',
+            padding: '12px 14px',
           }}
         >
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-            Status Relay Aktual:
+          <div style={{ fontSize: '0.725rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
+            Relay Fisik (GPIO 26)
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span
-              className="pulse-dot"
+              className={`status-dot ${relayStatus ? 'online' : 'offline'}`}
               style={{
-                background: relayStatus ? 'var(--plant-green)' : '#64748b',
-                width: '10px',
-                height: '10px',
+                background: relayStatus ? 'var(--status-ok)' : 'var(--text-dim)',
+                boxShadow: relayStatus ? '0 0 0 2px var(--status-ok-bg)' : 'none',
               }}
             />
             <span
               style={{
-                fontSize: '1.25rem',
-                fontWeight: 800,
-                color: relayStatus ? '#34d399' : 'var(--text-muted)',
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-mono)',
+                color: relayStatus ? 'var(--status-ok)' : 'var(--text-muted)',
               }}
             >
-              {relayStatus ? 'RELAY AKTIF' : 'RELAY NONAKTIF'}
+              {relayStatus ? 'ENERGIZED (ON)' : 'STANDBY (OFF)'}
             </span>
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Laporan Perangkat: {pump?.status?.reportedAt ? new Date(pump.status.reportedAt).toLocaleTimeString() : 'Menunggu sync'}
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            Sync: {pump?.status?.reportedAt ? new Date(pump.status.reportedAt).toLocaleTimeString('id-ID') : 'Menunggu telemetri'}
+          </div>
+        </div>
+
+        {/* Box 2: Perintah Kerja Sistem (Command State) */}
+        <div
+          style={{
+            background: 'var(--bg-card-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '12px 14px',
+          }}
+        >
+          <div style={{ fontSize: '0.725rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
+            Perintah Kontrol
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span
+              style={{
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-mono)',
+                color: commandVal ? 'var(--plant-green)' : 'var(--text-primary)',
+              }}
+            >
+              {commandVal ? 'ACTIVE (PUMP ON)' : 'IDLE (PUMP OFF)'}
+            </span>
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            Oleh: {pump?.command?.issuedBy || (isAuto ? 'Sistem Otomatis' : 'Manual Operator')}
           </div>
         </div>
 
       </div>
 
-      {/* Big Action Button (Mode Manual) */}
+      {/* Manual Actuator Trigger or Auto Configuration Summary */}
       {!isAuto ? (
         <button
+          type="button"
           onClick={handleToggleCommand}
           disabled={isUpdating}
           className={`btn ${commandVal ? 'btn-danger' : 'btn-primary'}`}
           style={{
             width: '100%',
-            padding: '14px',
-            fontSize: '1rem',
-            borderRadius: 'var(--radius-md)',
+            padding: '10px 16px',
+            fontSize: '0.875rem',
           }}
         >
-          <Power size={20} />
-          <span>{commandVal ? 'Matikan Pompa (Simulation Stop)' : 'Nyalakan Pompa (Simulation Start)'}</span>
+          <Power size={16} />
+          <span>{commandVal ? 'Hentikan Sirkulasi Pompa' : 'Aktifkan Pompa Air'}</span>
         </button>
       ) : (
-        /* Mode Otomatis Config Summary */
         <div
           style={{
-            background: 'rgba(99, 102, 241, 0.08)',
-            border: '1px solid rgba(99, 102, 241, 0.25)',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px',
+            background: 'var(--bg-card-subtle)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '12px 14px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: '#a5b4fc', fontSize: '0.875rem', fontWeight: 700 }}>
-            <Cpu size={18} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <ShieldCheck size={16} style={{ color: 'var(--plant-green)' }} />
             <span>Mode Otomatis Aktif (Hysteresis Guard)</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
             <div>
-              Mulai Siram Saat: <br />
-              <strong style={{ color: '#fff' }}>&lt; {pump?.auto?.triggerMoistureMin ?? 40}%</strong>
+              <span style={{ color: 'var(--text-muted)' }}>Mulai Penyiraman:</span><br />
+              <strong className="mono" style={{ color: 'var(--text-primary)' }}>&lt; {pump?.auto?.triggerMoistureMin ?? 40}%</strong>
             </div>
             <div>
-              Berhenti Siram Saat: <br />
-              <strong style={{ color: '#fff' }}>&gt;= {pump?.auto?.targetMoistureMax ?? 70}%</strong>
+              <span style={{ color: 'var(--text-muted)' }}>Cutoff Otomatis:</span><br />
+              <strong className="mono" style={{ color: 'var(--text-primary)' }}>&gt;= {pump?.auto?.targetMoistureMax ?? 70}%</strong>
             </div>
             <div>
-              Max Durasi: <br />
-              <strong style={{ color: '#fff' }}>{pump?.auto?.maxOnDurationSec ?? 120}s</strong>
+              <span style={{ color: 'var(--text-muted)' }}>Maksimal Durasi:</span><br />
+              <strong className="mono" style={{ color: 'var(--text-primary)' }}>{pump?.auto?.maxOnDurationSec ?? 120} detik</strong>
             </div>
             <div>
-              Cooldown: <br />
-              <strong style={{ color: '#fff' }}>{pump?.auto?.cooldownSec ?? 600}s</strong>
+              <span style={{ color: 'var(--text-muted)' }}>Jeda Cooldown:</span><br />
+              <strong className="mono" style={{ color: 'var(--text-primary)' }}>{pump?.auto?.cooldownSec ?? 600} detik</strong>
             </div>
           </div>
         </div>
@@ -253,4 +214,3 @@ export function PumpControl() {
 }
 
 export default PumpControl;
-

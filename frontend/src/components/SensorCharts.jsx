@@ -54,13 +54,13 @@ export function SensorCharts() {
           {
             label: 'Kelembapan Tanah (%)',
             data: historyData.map((d) => d.soilMoisture ?? null),
-            borderColor: '#14b8a6',
-            backgroundColor: isLight ? 'rgba(20, 184, 166, 0.16)' : 'rgba(20, 184, 166, 0.12)',
-            borderWidth: 2.5,
+            borderColor: '#0d9488',
+            backgroundColor: isLight ? 'rgba(13, 148, 136, 0.08)' : 'rgba(13, 148, 136, 0.12)',
+            borderWidth: 2,
             fill: true,
-            tension: 0.35,
-            pointRadius: historyData.length > 50 ? 0 : 3,
-            pointHoverRadius: 6,
+            tension: 0.25,
+            pointRadius: historyData.length > 40 ? 0 : 2.5,
+            pointHoverRadius: 5,
           },
         ],
       };
@@ -73,22 +73,23 @@ export function SensorCharts() {
           {
             label: 'Suhu Udara (°C)',
             data: historyData.map((d) => d.temperature ?? null),
-            borderColor: '#f97316',
-            backgroundColor: isLight ? 'rgba(249, 115, 22, 0.12)' : 'rgba(249, 115, 22, 0.08)',
+            borderColor: '#f59e0b',
+            backgroundColor: 'transparent',
             borderWidth: 2,
-            tension: 0.35,
+            tension: 0.25,
             yAxisID: 'yTemp',
-            pointRadius: historyData.length > 50 ? 0 : 3,
+            pointRadius: historyData.length > 40 ? 0 : 2.5,
           },
           {
             label: 'Kelembapan Udara (%)',
             data: historyData.map((d) => d.airHumidity ?? null),
-            borderColor: '#0ea5e9',
-            backgroundColor: isLight ? 'rgba(14, 165, 233, 0.12)' : 'rgba(14, 165, 233, 0.08)',
+            borderColor: '#0284c7',
+            backgroundColor: isLight ? 'rgba(2, 132, 199, 0.06)' : 'rgba(2, 132, 199, 0.1)',
             borderWidth: 2,
-            tension: 0.35,
+            fill: true,
+            tension: 0.25,
             yAxisID: 'yHum',
-            pointRadius: historyData.length > 50 ? 0 : 3,
+            pointRadius: historyData.length > 40 ? 0 : 2.5,
           },
         ],
       };
@@ -102,11 +103,11 @@ export function SensorCharts() {
           label: 'Intensitas Cahaya (Lux)',
           data: historyData.map((d) => d.lightLux ?? null),
           borderColor: '#eab308',
-          backgroundColor: isLight ? 'rgba(234, 179, 8, 0.18)' : 'rgba(234, 179, 8, 0.12)',
+          backgroundColor: isLight ? 'rgba(234, 179, 8, 0.08)' : 'rgba(234, 179, 8, 0.12)',
           borderWidth: 2,
           fill: true,
-          tension: 0.3,
-          pointRadius: historyData.length > 50 ? 0 : 3,
+          tension: 0.25,
+          pointRadius: historyData.length > 40 ? 0 : 2.5,
         },
       ],
     };
@@ -114,13 +115,13 @@ export function SensorCharts() {
 
   // Options Chart.js adaptif terhadap tema aktif
   const options = useMemo(() => {
-    const gridColor = isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.05)';
-    const tickColor = isLight ? '#475569' : '#64748b';
-    const legendColor = isLight ? '#1e293b' : '#94a3b8';
-    const tooltipBg = isLight ? '#ffffff' : '#0f172a';
+    const gridColor = isLight ? 'rgba(15, 23, 42, 0.06)' : 'rgba(255, 255, 255, 0.05)';
+    const tickColor = isLight ? '#64748b' : '#64748b';
+    const legendColor = isLight ? '#334155' : '#cbd5e1';
+    const tooltipBg = isLight ? '#ffffff' : '#131a1e';
     const tooltipTitle = isLight ? '#0f172a' : '#f8fafc';
-    const tooltipBody = isLight ? '#334155' : '#e2e8f0';
-    const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.15)';
+    const tooltipBody = isLight ? '#334155' : '#cbd5e1';
+    const tooltipBorder = isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.12)';
 
     return {
       responsive: true,
@@ -132,11 +133,14 @@ export function SensorCharts() {
       plugins: {
         legend: {
           position: 'top',
+          align: 'end',
           labels: {
             color: legendColor,
-            font: { family: 'Plus Jakarta Sans', size: 12, weight: 600 },
+            font: { family: 'Plus Jakarta Sans', size: 11, weight: 600 },
             usePointStyle: true,
             pointStyle: 'circle',
+            boxWidth: 6,
+            boxHeight: 6,
           },
         },
         tooltip: {
@@ -145,14 +149,16 @@ export function SensorCharts() {
           bodyColor: tooltipBody,
           borderColor: tooltipBorder,
           borderWidth: 1,
-          padding: 12,
-          cornerRadius: 10,
+          padding: 10,
+          cornerRadius: 6,
+          titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 700 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
         },
       },
       scales: {
         x: {
           grid: { color: gridColor },
-          ticks: { color: tickColor, maxTicksLimit: 12, font: { size: 11 } },
+          ticks: { color: tickColor, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 10 } },
         },
         ...(activeTab === 'climate'
           ? {
@@ -160,13 +166,13 @@ export function SensorCharts() {
                 type: 'linear',
                 position: 'left',
                 grid: { color: gridColor },
-                ticks: { color: '#f97316', callback: (v) => `${v}°C` },
+                ticks: { color: '#f59e0b', font: { family: 'JetBrains Mono', size: 10 }, callback: (v) => `${v}°C` },
               },
               yHum: {
                 type: 'linear',
                 position: 'right',
                 grid: { drawOnChartArea: false },
-                ticks: { color: '#0ea5e9', callback: (v) => `${v}%` },
+                ticks: { color: '#0284c7', font: { family: 'JetBrains Mono', size: 10 }, callback: (v) => `${v}%` },
               },
             }
           : {
@@ -174,6 +180,7 @@ export function SensorCharts() {
                 grid: { color: gridColor },
                 ticks: {
                   color: tickColor,
+                  font: { family: 'JetBrains Mono', size: 10 },
                   callback: (v) => (activeTab === 'soil' ? `${v}%` : `${v} lx`),
                 },
               },
@@ -183,83 +190,52 @@ export function SensorCharts() {
   }, [activeTab, isLight]);
 
   return (
-    <div className="card" style={{ marginBottom: '24px' }}>
+    <div className="card" style={{ marginBottom: '20px' }}>
       
-      {/* Header with Tabs & Period Selectors */}
-      <div className="card-header" style={{ flexWrap: 'wrap', gap: '14px' }}>
+      {/* Header with Segmented Tabs & Period Selectors */}
+      <div className="card-header" style={{ flexWrap: 'wrap', gap: '12px' }}>
         
         {/* Metric Selector Tabs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-card-subtle)', border: '1px solid var(--border-subtle)', padding: '4px', borderRadius: '12px' }}>
+        <div className="segmented-control">
           <button
+            type="button"
             onClick={() => setActiveTab('soil')}
-            className="btn"
-            style={{
-              padding: '6px 14px',
-              fontSize: '0.8rem',
-              borderRadius: '8px',
-              background: activeTab === 'soil' ? 'var(--soil-cyan)' : 'transparent',
-              color: activeTab === 'soil' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: 700,
-            }}
+            className={`segmented-btn ${activeTab === 'soil' ? 'active' : ''}`}
           >
-            <Waves size={15} />
-            <span>Tanah</span>
+            <Waves size={13} />
+            <span>Kelembapan Tanah</span>
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveTab('climate')}
-            className="btn"
-            style={{
-              padding: '6px 14px',
-              fontSize: '0.8rem',
-              borderRadius: '8px',
-              background: activeTab === 'climate' ? 'var(--temp-orange)' : 'transparent',
-              color: activeTab === 'climate' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: 700,
-            }}
+            className={`segmented-btn ${activeTab === 'climate' ? 'active' : ''}`}
           >
-            <Thermometer size={15} />
+            <Thermometer size={13} />
             <span>Suhu & Udara</span>
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveTab('light')}
-            className="btn"
-            style={{
-              padding: '6px 14px',
-              fontSize: '0.8rem',
-              borderRadius: '8px',
-              background: activeTab === 'light' ? 'var(--light-yellow)' : 'transparent',
-              color: activeTab === 'light' ? '#0b1315' : 'var(--text-secondary)',
-              fontWeight: 700,
-            }}
+            className={`segmented-btn ${activeTab === 'light' ? 'active' : ''}`}
           >
-            <Sun size={15} />
+            <Sun size={13} />
             <span>Cahaya</span>
           </button>
         </div>
 
         {/* Period Selector (24h / 7d / 30d) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Calendar size={15} style={{ color: 'var(--text-muted)' }} />
+        <div className="segmented-control">
           {['24h', '7d', '30d'].map((p) => {
             const labelMap = { '24h': '24 Jam', '7d': '7 Hari', '30d': '30 Hari' };
             const isSelected = historyPeriod === p;
             return (
               <button
+                type="button"
                 key={p}
                 onClick={() => setHistoryPeriod(p)}
-                style={{
-                  background: isSelected ? 'var(--btn-secondary-bg)' : 'transparent',
-                  color: isSelected ? 'var(--text-primary)' : 'var(--text-muted)',
-                  border: isSelected ? '1px solid var(--border-hover)' : '1px solid transparent',
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
+                className={`segmented-btn ${isSelected ? 'active' : ''}`}
               >
                 {labelMap[p]}
               </button>
@@ -270,7 +246,7 @@ export function SensorCharts() {
       </div>
 
       {/* Chart Canvas Area */}
-      <div style={{ height: '320px', width: '100%', position: 'relative' }}>
+      <div style={{ height: '300px', width: '100%', position: 'relative' }}>
         {chartData && chartData.labels.length > 0 ? (
           <Line data={chartData} options={options} />
         ) : (
@@ -281,16 +257,16 @@ export function SensorCharts() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '12px',
+              gap: '8px',
               color: 'var(--text-muted)',
             }}
           >
-            <Activity size={36} style={{ opacity: 0.4 }} />
-            <div style={{ fontSize: '0.9rem' }}>
-              Belum ada riwayat data untuk periode <strong>{historyPeriod}</strong>
+            <Activity size={28} style={{ opacity: 0.35 }} />
+            <div style={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+              Belum ada riwayat rekaman data untuk interval {historyPeriod}
             </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Jalankan <code>simulate_sensors.py</code> untuk mulai mengirim data riwayat berkala.
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+              Data otomatis terarsip setiap interval 5 menit dari telemetri perangkat
             </div>
           </div>
         )}

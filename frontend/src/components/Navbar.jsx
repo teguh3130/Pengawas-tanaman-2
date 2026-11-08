@@ -4,13 +4,11 @@ import { useTheme } from '../context/ThemeContext';
 import {
   Sprout,
   RefreshCw,
-  Wifi,
-  WifiOff,
+  Cpu,
+  FlaskConical,
   Clock,
   Sparkles,
   Layers,
-  FlaskConical,
-  Cpu,
   Sun,
   Moon,
   Monitor,
@@ -21,7 +19,6 @@ export function Navbar({ onOpenAiModal, onOpenPlantModal, onOpenPlantDetail }) {
     plant,
     isSimulator,
     deviceStatus,
-    isBackendOnline,
     lastUpdated,
     refreshAll,
     isRefreshing,
@@ -42,201 +39,189 @@ export function Navbar({ onOpenAiModal, onOpenPlantModal, onOpenPlantDetail }) {
       style={{
         borderBottom: '1px solid var(--border-subtle)',
         background: 'var(--bg-header)',
-        backdropFilter: 'blur(16px)',
+        backdropFilter: 'blur(8px)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        transition: 'background-color 0.25s ease, border-color 0.25s ease',
+        transition: 'background-color 0.2s ease, border-color 0.2s ease',
       }}
     >
-      <div className="container" style={{ padding: '14px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+      <div className="container" style={{ padding: '12px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
           
-          {/* Logo & Plant Name */}
+          {/* 1. Left: Brand & Plant Overview */}
           <div
             onClick={onOpenPlantDetail}
-            style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: onOpenPlantDetail ? 'pointer' : 'default' }}
-            title={onOpenPlantDetail ? 'Klik untuk melihat Detail & Panduan Tanaman' : undefined}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: onOpenPlantDetail ? 'pointer' : 'default',
+              userSelect: 'none',
+            }}
+            title={onOpenPlantDetail ? 'Klik untuk membuka Detail & Panduan Tanaman' : undefined}
           >
             <div
               style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+                width: '36px',
+                height: '36px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--plant-green)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#fff',
-                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.35)',
+                color: '#ffffff',
                 flexShrink: 0,
               }}
             >
-              <Sprout size={24} />
+              <Sprout size={20} />
             </div>
+
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h1 style={{ fontSize: '1.25rem', fontWeight: '800', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+                <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                   {plant?.name || 'Sistem Pengawas Tanaman'}
-                </h1>
+                </span>
                 {plant?.type && (
                   <span
                     style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--text-secondary)',
+                      fontSize: '0.6875rem',
+                      fontWeight: 600,
+                      color: 'var(--text-muted)',
                       background: 'var(--bg-card-subtle)',
                       border: '1px solid var(--border-subtle)',
-                      padding: '2px 8px',
-                      borderRadius: '6px',
+                      padding: '1px 6px',
+                      borderRadius: 'var(--radius-xs)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
                     }}
                   >
                     {plant.type}
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span>IoT Monitoring & AI Plant Care</span>
-                {plant?.location && <span>• Lokasi: {plant.location}</span>}
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>IoT Telemetri & Otomasi</span>
+                {plant?.location && <span>• {plant.location}</span>}
               </div>
             </div>
           </div>
 
-          {/* Status Badges, Theme Switcher & Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* 2. Right: Industrial Toolbar & Status */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             
-            {/* 1. Indikator Sumber Data: SIMULATOR vs REAL */}
-            {isSimulator ? (
-              <div
-                className="badge badge-simulated"
-                title="Data saat ini dihasilkan oleh Python Sensor Simulator untuk keperluan pengujian"
-                style={{ padding: '6px 12px' }}
-              >
-                <FlaskConical size={14} />
-                <span>DATA SIMULASI</span>
-              </div>
-            ) : (
-              <div
-                className="badge badge-real"
-                title="Data bersumber dari pengukuran sensor fisik ESP32"
-                style={{ padding: '6px 12px' }}
-              >
-                <Cpu size={14} />
-                <span>SENSOR FISIK</span>
-              </div>
-            )}
-
-            {/* 2. Koneksi Device (ESP32/Simulator) */}
+            {/* Telemetry Source & Device State Tag */}
             <div
-              className={`badge ${isDeviceOnline ? 'badge-online' : 'badge-offline'}`}
-              title={
-                isDeviceOnline
-                  ? `Perangkat aktif. Terakhir update: ${deviceStatus?.lastSeen ? new Date(deviceStatus.lastSeen).toLocaleTimeString() : '-'}`
-                  : 'Perangkat offline / belum mengirim data'
-              }
-              style={{ padding: '6px 12px' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 10px',
+                background: 'var(--bg-card-subtle)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '0.75rem',
+              }}
             >
-              <span className="pulse-dot" style={{ background: isDeviceOnline ? '#10b981' : '#ef4444' }} />
-              {isDeviceOnline ? (
-                <>
-                  <Wifi size={14} />
-                  <span>PERANGKAT ON</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff size={14} />
-                  <span>PERANGKAT OFF</span>
-                </>
-              )}
+              <span
+                className={`status-dot ${isDeviceOnline ? 'online' : 'offline'}`}
+                title={isDeviceOnline ? 'Hardware ESP32 aktif terhubung' : 'Hardware ESP32 offline'}
+              />
+              <span style={{ fontWeight: 600, color: isDeviceOnline ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                {isDeviceOnline ? 'ESP32 ON' : 'ESP32 STANDBY'}
+              </span>
+              <span style={{ color: 'var(--border-strong)' }}>|</span>
+              <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {isSimulator ? (
+                  <>
+                    <FlaskConical size={12} style={{ color: 'var(--temp-amber)' }} />
+                    <span>Simulasi</span>
+                  </>
+                ) : (
+                  <>
+                    <Cpu size={12} style={{ color: 'var(--plant-green)' }} />
+                    <span>Sensor Fisik</span>
+                  </>
+                )}
+              </span>
             </div>
 
-            {/* 3. Live Clock */}
+            {/* Industrial Live Clock */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                fontSize: '0.8rem',
-                color: 'var(--text-secondary)',
-                padding: '6px 10px',
-                background: 'var(--bg-card-subtle)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '8px',
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                padding: '4px 8px',
               }}
               className="mono"
             >
-              <Clock size={14} style={{ color: 'var(--plant-green)' }} />
+              <Clock size={13} />
               <span>{currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} WIB</span>
             </div>
 
-            {/* 4. Theme Switcher Segmented Control (Light, Dark, Auto) */}
-            <div className="theme-switcher" title={`Tema aktif: ${theme} (tampilan: ${resolvedTheme})`}>
+            {/* Clean Segmented Theme Switcher */}
+            <div className="segmented-control" title={`Tema: ${theme}`}>
               <button
                 type="button"
                 onClick={() => setTheme('light')}
-                className={`theme-switcher-btn ${theme === 'light' ? 'active' : ''}`}
-                title="Tema Terang (Light)"
-                aria-label="Tema Terang"
+                className={`segmented-btn ${theme === 'light' ? 'active' : ''}`}
+                title="Tema Terang"
               >
-                <Sun size={14} />
-                <span>Light</span>
+                <Sun size={13} />
               </button>
               <button
                 type="button"
                 onClick={() => setTheme('dark')}
-                className={`theme-switcher-btn ${theme === 'dark' ? 'active' : ''}`}
-                title="Tema Gelap (Dark)"
-                aria-label="Tema Gelap"
+                className={`segmented-btn ${theme === 'dark' ? 'active' : ''}`}
+                title="Tema Gelap"
               >
-                <Moon size={14} />
-                <span>Dark</span>
+                <Moon size={13} />
               </button>
               <button
                 type="button"
                 onClick={() => setTheme('auto')}
-                className={`theme-switcher-btn ${theme === 'auto' ? 'active' : ''}`}
-                title="Mengikuti Tema Sistem Operasi (Auto)"
-                aria-label="Tema Auto"
+                className={`segmented-btn ${theme === 'auto' ? 'active' : ''}`}
+                title="Otomatis (OS)"
               >
-                <Monitor size={14} />
-                <span>Auto</span>
+                <Monitor size={13} />
               </button>
             </div>
 
-            {/* 5. Action Buttons */}
-            <button
-              onClick={refreshAll}
-              disabled={isRefreshing}
-              className="btn btn-secondary btn-icon"
-              title="Perbarui data sekarang"
-            >
-              <RefreshCw size={16} className={isRefreshing ? 'spin-anim' : ''} style={{ animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }} />
-            </button>
+            {/* Action Group */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={refreshAll}
+                disabled={isRefreshing}
+                className="btn btn-secondary btn-icon"
+                title="Sinkronisasi data sekarang"
+              >
+                <RefreshCw size={14} className={isRefreshing ? 'spin-anim' : ''} />
+              </button>
 
-            <button
-              onClick={onOpenPlantModal}
-              className="btn btn-secondary"
-              style={{ padding: '8px 14px', fontSize: '0.825rem' }}
-            >
-              <Layers size={15} />
-              <span>Tanaman</span>
-            </button>
+              <button
+                onClick={onOpenPlantModal}
+                className="btn btn-secondary"
+              >
+                <Layers size={14} />
+                <span>Tanaman</span>
+              </button>
 
-            <button
-              onClick={onOpenAiModal}
-              className="btn btn-ai"
-              style={{ padding: '8px 16px', fontSize: '0.825rem' }}
-            >
-              <Sparkles size={15} />
-              <span>Gemini AI</span>
-            </button>
+              <button
+                onClick={onOpenAiModal}
+                className="btn btn-ai"
+              >
+                <Sparkles size={14} />
+                <span>Gemini AI</span>
+              </button>
+            </div>
 
           </div>
 
         </div>
       </div>
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </header>
   );
 }

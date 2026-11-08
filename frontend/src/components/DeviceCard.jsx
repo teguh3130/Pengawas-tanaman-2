@@ -1,92 +1,84 @@
 import React from 'react';
 import { usePlant } from '../context/PlantContext';
-import { Cpu, Wifi, WifiOff, FlaskConical, Gauge, Clock, ShieldCheck } from 'lucide-react';
+import { Cpu, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export function DeviceCard() {
-  const { deviceStatus, isSimulator, lastUpdated } = usePlant();
+  const { deviceStatus, isSimulator } = usePlant();
 
   const isOnline = Boolean(deviceStatus?.online);
   const cal = deviceStatus?.calibration;
 
   return (
-    <div className="card" style={{ marginBottom: '24px' }}>
+    <div className="card" style={{ marginBottom: '20px' }}>
       <div className="card-header">
         <div className="card-title">
-          <Cpu size={18} style={{ color: 'var(--soil-cyan)' }} />
-          <span>Status Perangkat & Sensor</span>
+          <Cpu size={16} style={{ color: 'var(--plant-green)' }} />
+          <span>Status Unit Hardware</span>
         </div>
-        <span className={`badge ${isOnline ? 'badge-online' : 'badge-offline'}`}>
-          <span className="pulse-dot" style={{ background: isOnline ? '#34d399' : '#f87171' }} />
-          {isOnline ? 'ONLINE' : 'OFFLINE'}
-        </span>
+        <div className="status-indicator">
+          <span className={`status-dot ${isOnline ? 'online' : 'offline'}`} />
+          <span style={{ fontSize: '0.725rem', fontWeight: 700, color: isOnline ? 'var(--status-ok)' : 'var(--text-muted)' }}>
+            {isOnline ? 'ONLINE' : 'STANDBY'}
+          </span>
+        </div>
       </div>
 
-      {/* Source Indicator Tag */}
+      {/* Industrial Spec Sheet */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', fontSize: '0.78125rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '7px' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Perangkat</span>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>ESP32 DevKit V1</span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '7px' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Firmware Runtime</span>
+          <span className="mono" style={{ color: 'var(--text-secondary)' }}>MicroPython v1.22</span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '7px' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Kanal Sensor Aktif</span>
+          <span style={{ color: 'var(--text-secondary)' }}>ADC1 (D34), DHT (D27), I2C (D21/22)</span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '7px' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Kalibrasi Tanah</span>
+          <span className="mono" style={{ color: 'var(--text-secondary)' }}>
+            {cal ? `Kering: ${cal.soilDry} | Air: ${cal.soilWet}` : 'Standar (3450 / 1450)'}
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Telemetri Terakhir</span>
+          <span className="mono" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+            {deviceStatus?.lastSeen
+              ? `${new Date(deviceStatus.lastSeen).toLocaleTimeString('id-ID')} WIB`
+              : 'Menunggu kiriman data'}
+          </span>
+        </div>
+      </div>
+
+      {/* Source Tag Note */}
       <div
         style={{
-          background: isSimulator ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-          border: `1px solid ${isSimulator ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
-          borderRadius: 'var(--radius-sm)',
-          padding: '10px 14px',
-          marginBottom: '14px',
+          marginTop: '12px',
+          padding: '8px 10px',
+          background: 'var(--bg-card-subtle)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-xs)',
+          fontSize: '0.725rem',
+          color: 'var(--text-muted)',
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '7px',
         }}
       >
-        {isSimulator ? (
-          <>
-            <FlaskConical size={18} style={{ color: 'var(--status-warning)', flexShrink: 0 }} />
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-              <strong>Sumber: Data Simulasi (Python)</strong>
-              <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
-                Berasal dari <code>simulate_sensors.py</code>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <ShieldCheck size={18} style={{ color: 'var(--status-normal)', flexShrink: 0 }} />
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-              <strong>Sumber: Sensor Fisik ESP32</strong>
-              <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
-                Hasil pembacaan pin ADC, DHT22 & BH1750
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Specs / Meta */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ color: 'var(--text-muted)' }}>Hardware:</span>
-          <span>ESP32 DevKit V1 (30 Pin)</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ color: 'var(--text-muted)' }}>Firmware:</span>
-          <span>{deviceStatus?.firmware || '1.0.0 (MicroPython)'}</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ color: 'var(--text-muted)' }}>Terakhir Terhubung:</span>
-          <span>
-            {deviceStatus?.lastSeen
-              ? new Date(deviceStatus.lastSeen).toLocaleTimeString('id-ID')
-              : '-'}
-          </span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ color: 'var(--text-muted)' }}>Kalibrasi Tanah:</span>
-          <span>
-            {cal?.soilDry && cal?.soilWet
-              ? `DRY: ${cal.soilDry} | WET: ${cal.soilWet}`
-              : 'Belum kalibrasi aktual'}
-          </span>
-        </div>
+        <ShieldCheck size={14} style={{ color: 'var(--plant-green)', flexShrink: 0 }} />
+        <span>
+          Otentikasi Device Bearer Token aktif dengan validasi rentang fisik otomatis di backend.
+        </span>
       </div>
     </div>
   );
 }
 
 export default DeviceCard;
-

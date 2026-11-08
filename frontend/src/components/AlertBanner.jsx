@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePlant } from '../context/PlantContext';
-import { AlertTriangle, AlertCircle, Info, FlaskConical, ServerCrash, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info, FlaskConical, ServerCrash } from 'lucide-react';
 
 export function AlertBanner() {
   const { sensorData, requirements, isSimulator, isBackendOnline, errorMessage, backendHealth } = usePlant();
@@ -20,19 +20,19 @@ export function AlertBanner() {
         activeAlerts.push({
           level: 'danger',
           title: 'Kelembapan Tanah Kritis',
-          message: `Kelembapan tanah ${soil}% berada di bawah batas minimum aman (${soilWarnMin}%). Sistem mempertimbangkan penyiraman.`,
+          message: `Nilai kelembapan ${soil}% di bawah batas toleransi minimum (${soilWarnMin}%). Sistem mengaktifkan protokol irigasi.`,
         });
       } else if (soilIdealMin !== undefined && soil < soilIdealMin) {
         activeAlerts.push({
           level: 'warning',
           title: 'Kelembapan Tanah Rendah',
-          message: `Kelembapan tanah ${soil}% sedikit di bawah rentang ideal (${soilIdealMin}%).`,
+          message: `Nilai kelembapan ${soil}% mendekati batas bawah rekomendasi ideal (${soilIdealMin}%).`,
         });
       } else if (soilWarnMax !== undefined && soil > soilWarnMax) {
         activeAlerts.push({
           level: 'warning',
-          title: 'Kelembapan Tanah Berlebih',
-          message: `Kelembapan tanah ${soil}% melebihi batas toleransi atas (${soilWarnMax}%).`,
+          title: 'Kelembapan Tanah Jenuh',
+          message: `Nilai kelembapan ${soil}% melebihi kapasitas lapang ideal (${soilWarnMax}%).`,
         });
       }
     }
@@ -46,14 +46,14 @@ export function AlertBanner() {
       if (tempWarnMax !== undefined && temp > tempWarnMax) {
         activeAlerts.push({
           level: 'danger',
-          title: 'Suhu Udara Terlalu Panas',
-          message: `Suhu saat ini ${temp}°C melampaui batas toleransi tanaman (${tempWarnMax}°C).`,
+          title: 'Suhu Udara Melebihi Batas',
+          message: `Suhu saat ini ${temp}°C melampaui toleransi biologis tanaman (${tempWarnMax}°C).`,
         });
       } else if (tempWarnMin !== undefined && temp < tempWarnMin) {
         activeAlerts.push({
           level: 'warning',
-          title: 'Suhu Udara Dingin',
-          message: `Suhu saat ini ${temp}°C di bawah batas ideal (${tempWarnMin}°C).`,
+          title: 'Suhu Lingkungan Rendah',
+          message: `Suhu saat ini ${temp}°C berada di bawah rentang optimal (${tempWarnMin}°C).`,
         });
       }
     }
@@ -65,33 +65,34 @@ export function AlertBanner() {
       if (minLux !== undefined && lux < minLux) {
         activeAlerts.push({
           level: 'info',
-          title: 'Intensitas Cahaya Rendah',
-          message: `Intensitas ${lux} Lux lebih rendah dari kebutuhan minimal (${minLux} Lux). Pastikan tanaman mendapat cahaya cukup.`,
+          title: 'Fotoperiode / Intensitas Minim',
+          message: `Intensitas radiasi cahaya ${lux} Lux di bawah ambang fotosintesis efektif (${minLux} Lux).`,
         });
       }
     }
   }
 
   return (
-    <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
       
       {/* Backend Offline Banner */}
       {!isBackendOnline && (
         <div
           style={{
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 18px',
+            background: 'var(--status-crit-bg)',
+            border: '1px solid var(--status-crit-border)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '10px 14px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            color: '#fca5a5',
+            gap: '10px',
+            color: 'var(--status-crit)',
+            fontSize: '0.8125rem',
           }}
         >
-          <ServerCrash size={20} style={{ flexShrink: 0, color: '#ef4444' }} />
-          <div style={{ fontSize: '0.875rem' }}>
-            <strong>Backend Terputus:</strong> {errorMessage || 'Server backend Node.js tidak merespons.'}
+          <ServerCrash size={18} style={{ flexShrink: 0 }} />
+          <div>
+            <strong>Koneksi API Backend Terputus:</strong> {errorMessage || 'Server backend Node.js tidak merespons.'}
           </div>
         </div>
       )}
@@ -100,19 +101,20 @@ export function AlertBanner() {
       {isBackendOnline && backendHealth?.firebase === 'unconfigured' && (
         <div
           style={{
-            background: 'rgba(245, 158, 11, 0.1)',
-            border: '1px solid rgba(245, 158, 11, 0.25)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 18px',
+            background: 'var(--status-warn-bg)',
+            border: '1px solid var(--status-warn-border)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '10px 14px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            color: '#fde68a',
+            gap: '10px',
+            color: 'var(--status-warn)',
+            fontSize: '0.8125rem',
           }}
         >
-          <Info size={20} style={{ flexShrink: 0, color: '#f59e0b' }} />
-          <div style={{ fontSize: '0.875rem' }}>
-            <strong>Firebase Mode Standby:</strong> File <code>serviceAccountKey.json</code> belum diisi di backend. Data saat ini disimpan dalam buffer runtime dan siap terhubung saat kunci ditambahkan.
+          <Info size={18} style={{ flexShrink: 0 }} />
+          <div>
+            <strong>Firebase Standby:</strong> Menunggu sinkronisasi berkas <code>serviceAccountKey.json</code> pada backend.
           </div>
         </div>
       )}
@@ -121,57 +123,58 @@ export function AlertBanner() {
       {isSimulator && (
         <div
           style={{
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px dashed rgba(245, 158, 11, 0.35)',
-            borderRadius: 'var(--radius-md)',
-            padding: '10px 18px',
+            background: 'var(--bg-card-subtle)',
+            border: '1px dashed var(--border-strong)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '8px 12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '10px',
-            color: '#fef3c7',
-            fontSize: '0.825rem',
+            gap: '8px',
+            color: 'var(--text-secondary)',
+            fontSize: '0.78125rem',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <FlaskConical size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FlaskConical size={16} style={{ color: 'var(--temp-amber)', flexShrink: 0 }} />
             <span>
-              <strong>Mode Simulasi Aktif:</strong> Nilai sensor berasal dari <code>Python Sensor Simulator</code>. Kontrol pompa bekerja dalam simulasi virtual tertutup dan tidak menggerakkan relay fisik 12V.
+              <strong>Mode Telemetri Uji (Simulasi Virtual):</strong> Data sensor dialirkan dari skrip pengujian software.
             </span>
           </div>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-            Simulator v1.0 • Endpoint: /api/sensor
+          <span className="mono" style={{ color: 'var(--text-muted)', fontSize: '0.725rem' }}>
+            POST /api/sensor
           </span>
         </div>
       )}
 
-      {/* Plant Health Alerts */}
+      {/* Plant Health Threshold Alerts */}
       {activeAlerts.map((alert, idx) => {
         const isDanger = alert.level === 'danger';
         const isWarning = alert.level === 'warning';
-        const borderColor = isDanger ? 'rgba(239, 68, 68, 0.35)' : isWarning ? 'rgba(245, 158, 11, 0.35)' : 'rgba(14, 165, 233, 0.35)';
-        const bgColor = isDanger ? 'rgba(239, 68, 68, 0.12)' : isWarning ? 'rgba(245, 158, 11, 0.1)' : 'rgba(14, 165, 233, 0.1)';
-        const textColor = isDanger ? '#fca5a5' : isWarning ? '#fde68a' : '#bae6fd';
+        const bg = isDanger ? 'var(--status-crit-bg)' : isWarning ? 'var(--status-warn-bg)' : 'var(--status-info-bg)';
+        const border = isDanger ? 'var(--status-crit-border)' : isWarning ? 'var(--status-warn-border)' : 'var(--status-info-border)';
+        const color = isDanger ? 'var(--status-crit)' : isWarning ? 'var(--status-warn)' : 'var(--status-info)';
         const IconComponent = isDanger ? AlertCircle : isWarning ? AlertTriangle : Info;
 
         return (
           <div
             key={idx}
             style={{
-              background: bgColor,
-              border: `1px solid ${borderColor}`,
-              borderRadius: 'var(--radius-md)',
-              padding: '12px 18px',
+              background: bg,
+              border: `1px solid ${border}`,
+              borderRadius: 'var(--radius-sm)',
+              padding: '10px 14px',
               display: 'flex',
               alignItems: 'flex-start',
-              gap: '12px',
-              color: textColor,
+              gap: '10px',
+              color: color,
+              fontSize: '0.8125rem',
             }}
           >
-            <IconComponent size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div style={{ fontSize: '0.875rem' }}>
-              <strong>{alert.title}:</strong> {alert.message}
+            <IconComponent size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <strong style={{ fontWeight: 700 }}>{alert.title}:</strong> {alert.message}
             </div>
           </div>
         );
@@ -182,4 +185,3 @@ export function AlertBanner() {
 }
 
 export default AlertBanner;
-
