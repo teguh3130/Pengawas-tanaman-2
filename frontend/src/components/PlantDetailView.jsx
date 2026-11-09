@@ -163,54 +163,135 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
 
   return (
     <div style={{ animation: 'fadeIn 0.25s ease' }}>
-      
+
       {/* ── Top Bar: Back Button & Header ───────────────────────────────────── */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '24px',
-          flexWrap: 'wrap',
-          gap: '14px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      <style>{`
+        .plant-detail-topbar {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .plant-detail-topbar-left {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          flex: 1;
+          min-width: 0;
+        }
+        .plant-detail-topbar-title h1 {
+          font-size: 1.3rem;
+          font-weight: 800;
+          color: var(--text-primary);
+          line-height: 1.3;
+        }
+        .plant-detail-topbar-title p {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          margin-top: 2px;
+        }
+        .plant-detail-topbar-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+          flex-wrap: wrap;
+        }
+        @media (max-width: 540px) {
+          .plant-detail-topbar {
+            flex-direction: column;
+          }
+          .plant-detail-topbar-left {
+            flex-direction: column;
+            gap: 8px;
+          }
+          .plant-detail-topbar-title h1 {
+            font-size: 1.1rem;
+          }
+          .plant-detail-topbar-actions {
+            width: 100%;
+          }
+          .plant-detail-topbar-actions .btn {
+            flex: 1;
+            justify-content: center;
+            font-size: 0.8rem;
+          }
+        }
+        .plant-param-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+        .plant-info-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 20px;
+          margin-bottom: 16px;
+        }
+        .plant-edit-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        @media (max-width: 480px) {
+          .plant-param-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
+          .plant-info-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+          }
+          .plant-edit-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        @media (max-width: 360px) {
+          .plant-param-grid {
+            grid-template-columns: 1fr;
+          }
+          .plant-info-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+      <div className="plant-detail-topbar">
+        <div className="plant-detail-topbar-left">
           <button
             onClick={onBack}
             className="btn btn-secondary"
-            style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+            style={{ padding: '8px 14px', fontSize: '0.82rem', flexShrink: 0 }}
           >
-            <ArrowLeft size={16} />
-            <span>Kembali ke Dashboard</span>
+            <ArrowLeft size={15} />
+            <span>Kembali</span>
           </button>
-          <div>
-            <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              Detail & Panduan Perawatan Tanaman
-            </h1>
-            <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-              Profil budidaya lengkap dan parameter monitoring ilmiah Google Gemini AI
-            </p>
+          <div className="plant-detail-topbar-title">
+            <h1>Detail &amp; Panduan Perawatan Tanaman</h1>
+            <p>Profil budidaya dan parameter monitoring Google Gemini AI</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="plant-detail-topbar-actions">
           <button
             onClick={onOpenPlantModal}
             className="btn btn-secondary"
-            style={{ fontSize: '0.825rem', padding: '8px 14px' }}
+            style={{ fontSize: '0.82rem', padding: '8px 14px' }}
           >
-            <Edit3 size={15} />
-            <span>Ubah Profil Tanaman</span>
+            <Edit3 size={14} />
+            <span>Ubah Profil</span>
           </button>
           <button
             onClick={handleStartAnalysis}
             disabled={isLoadingAi}
             className="btn btn-ai"
-            style={{ fontSize: '0.825rem', padding: '8px 16px' }}
+            style={{ fontSize: '0.82rem', padding: '8px 14px' }}
           >
-            <Sparkles size={15} />
-            <span>{isLoadingAi ? 'Memproses AI...' : 'Tanya Gemini AI'}</span>
+            <Sparkles size={14} />
+            <span>{isLoadingAi ? 'Memproses...' : 'Gemini AI'}</span>
           </button>
         </div>
       </div>
@@ -270,7 +351,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '16px' }}>
+        <div className="plant-info-grid">
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Nama Tanaman
@@ -364,10 +445,10 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
           <div>
             {requirements ? (
               <div>
-                
+
                 {/* 4 Cards Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '20px' }}>
-                  
+                <div className="plant-param-grid">
+
                   {/* Kelembapan Tanah */}
                   <div
                     style={{
@@ -472,7 +553,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
 
                 {/* Deskripsi & Panduan Lengkap */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
-                  
+
                   {requirements.description && (
                     <div style={{ background: 'var(--bg-app)', padding: '16px 20px', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
                       <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
@@ -552,7 +633,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
               Ubah batas ideal dan batas waspada parameter tanaman secara manual:
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+            <div className="plant-edit-grid">
               <div className="form-group">
                 <label className="form-label">Kelembapan Tanah Ideal Min / Max (%)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -594,7 +675,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+            <div className="plant-edit-grid">
               <div className="form-group">
                 <label className="form-label">Suhu Udara Ideal Min / Max (°C)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>

@@ -398,7 +398,7 @@ export function GeminiModal({ isOpen, onClose }) {
               Sesuaikan ambang batas toleransi secara spesifik sesuai kondisi media tanam Anda:
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Kelembapan Tanah Ideal Min / Max (%)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -440,7 +440,7 @@ export function GeminiModal({ isOpen, onClose }) {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div className="form-grid-2">
               <div className="form-group">
                 <label className="form-label">Suhu Udara Ideal Min / Max (°C)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>

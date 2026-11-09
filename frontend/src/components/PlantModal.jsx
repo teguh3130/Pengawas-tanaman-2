@@ -146,7 +146,7 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="form-grid-2">
             <div className="form-group">
               <label className="form-label">Nama Tanaman *</label>
               <input
@@ -174,7 +174,7 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="form-grid-2">
             <div className="form-group">
               <label className="form-label">Varietas (Opsional)</label>
               <input
