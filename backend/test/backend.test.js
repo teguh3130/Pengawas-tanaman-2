@@ -234,7 +234,6 @@ describe('HTTP Endpoints & Middleware Security', () => {
     assert.equal(res.body.success, false);
     assert.ok(res.body.details.some(d => d.field === 'name'));
     assert.ok(res.body.details.some(d => d.field === 'type'));
-    assert.ok(res.body.details.some(d => d.field === 'location'));
   });
 
   it('POST /api/pump/command memvalidasi input boolean command (400 jika bukan boolean)', async () => {

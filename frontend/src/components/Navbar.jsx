@@ -232,23 +232,27 @@ export function Navbar({ onOpenAiModal, onOpenPlantModal, onOpenPlantDetail }) {
             </button>
 
             {/* Main Action Buttons */}
-            <button
-              type="button"
-              onClick={onOpenPlantModal}
-              className="btn btn-secondary"
-            >
-              <Layers size={13} />
-              <span>Tanaman</span>
-            </button>
+            {onOpenPlantModal && (
+              <button
+                type="button"
+                onClick={onOpenPlantModal}
+                className="btn btn-secondary"
+              >
+                <Layers size={13} />
+                <span>Tanaman</span>
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={onOpenAiModal}
-              className="btn btn-ai"
-            >
-              <Sparkles size={13} />
-              <span>Gemini AI</span>
-            </button>
+            {onOpenAiModal && (
+              <button
+                type="button"
+                onClick={onOpenAiModal}
+                className="btn btn-ai"
+              >
+                <Sparkles size={13} />
+                <span>Asisten AI</span>
+              </button>
+            )}
           </div>
 
           {/* 3. Mobile Header Controls (Visible only on <= 768px) */}
@@ -315,25 +319,29 @@ export function Navbar({ onOpenAiModal, onOpenPlantModal, onOpenPlantDetail }) {
 
           {/* Action Buttons in Mobile Subbar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <button
-              type="button"
-              onClick={onOpenPlantModal}
-              className="btn btn-secondary"
-              style={{ padding: '5px 10px', fontSize: '0.75rem', minHeight: '32px' }}
-            >
-              <Layers size={12} />
-              <span>Tanaman</span>
-            </button>
+            {onOpenPlantModal && (
+              <button
+                type="button"
+                onClick={onOpenPlantModal}
+                className="btn btn-secondary"
+                style={{ padding: '5px 10px', fontSize: '0.75rem', minHeight: '32px' }}
+              >
+                <Layers size={12} />
+                <span>Tanaman</span>
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={onOpenAiModal}
-              className="btn btn-ai"
-              style={{ padding: '5px 12px', fontSize: '0.75rem', minHeight: '32px' }}
-            >
-              <Sparkles size={12} />
-              <span>Gemini AI</span>
-            </button>
+            {onOpenAiModal && (
+              <button
+                type="button"
+                onClick={onOpenAiModal}
+                className="btn btn-ai"
+                style={{ padding: '5px 12px', fontSize: '0.75rem', minHeight: '32px' }}
+              >
+                <Sparkles size={12} />
+                <span>Asisten AI</span>
+              </button>
+            )}
           </div>
         </div>
 

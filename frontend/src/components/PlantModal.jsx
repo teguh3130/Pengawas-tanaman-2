@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { usePlant } from '../context/PlantContext';
-import { X, Sprout, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Sprout, Save, AlertCircle, CheckCircle, Trash2 } from 'lucide-react';
 
 export function PlantModal({ isOpen, onClose, onOpenAi }) {
-  const { plant, savePlantConfig } = usePlant();
+  const { plant, savePlantConfig, removePlantProfile } = usePlant();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -15,6 +15,8 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
 
@@ -24,11 +26,16 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
         name: plant.name || '',
         type: plant.type || '',
         variety: plant.variety || '',
-        location: plant.location || '',
+        location: plant.location === '-' ? '' : (plant.location || ''),
         startedAt: plant.startedAt ? new Date(plant.startedAt).toISOString().split('T')[0] : '',
         additionalInfo: plant.additionalInfo || '',
       });
     }
+    setConfirmDelete(false);
+    setIsDeleting(false);
+    setIsSaving(false);
+    setErrorMsg(null);
+    setSuccessMsg(null);
   }, [plant, isOpen]);
 
   if (!isOpen) return null;
@@ -107,19 +114,19 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
         {errorMsg && (
           <div
             style={{
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
+              background: 'var(--status-danger-muted)',
+              border: '1px solid rgba(220, 38, 38, 0.35)',
               borderRadius: 'var(--radius-sm)',
               padding: '10px 14px',
               marginBottom: '16px',
               fontSize: '0.85rem',
-              color: '#fca5a5',
+              color: 'var(--status-danger)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
             }}
           >
-            <AlertCircle size={16} />
+            <AlertCircle size={16} style={{ flexShrink: 0 }} />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -127,19 +134,19 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
         {successMsg && (
           <div
             style={{
-              background: 'rgba(16, 185, 129, 0.15)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
+              background: 'var(--status-normal-muted)',
+              border: '1px solid rgba(22, 163, 74, 0.35)',
               borderRadius: 'var(--radius-sm)',
               padding: '10px 14px',
               marginBottom: '16px',
               fontSize: '0.85rem',
-              color: '#6ee7b7',
+              color: 'var(--status-normal)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
             }}
           >
-            <CheckCircle size={16} />
+            <CheckCircle size={16} style={{ flexShrink: 0 }} />
             <span>{successMsg}</span>
           </div>
         )}
@@ -188,11 +195,10 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Lokasi Penanaman *</label>
+              <label className="form-label">Lokasi Penanaman (Opsional)</label>
               <input
                 type="text"
                 name="location"
-                required
                 value={formData.location}
                 onChange={handleChange}
                 placeholder="Contoh: Greenhouse / Halaman Belakang"
@@ -225,23 +231,87 @@ export function PlantModal({ isOpen, onClose, onOpenAi }) {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="btn btn-primary"
-            >
-              <Save size={16} />
-              <span>{isSaving ? 'Menyimpan...' : 'Simpan Data'}</span>
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
+            {plant ? (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="btn btn-danger"
+                style={{ fontSize: '0.8rem' }}
+              >
+                <Trash2 size={15} />
+                <span>Hapus Tanaman</span>
+              </button>
+            ) : <div />}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-secondary"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="btn btn-primary"
+              >
+                <Save size={16} />
+                <span>{isSaving ? 'Menyimpan...' : 'Simpan Data'}</span>
+              </button>
+            </div>
           </div>
+
+          {confirmDelete && (
+            <div
+              style={{
+                marginTop: '16px',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--status-danger-muted)',
+                border: '1px solid rgba(220, 38, 38, 0.35)',
+              }}
+            >
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--status-danger)', marginBottom: '4px' }}>
+                Konfirmasi Hapus Profil Tanaman
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '10px', lineHeight: 1.45 }}>
+                Anda akan keluar dari profil <strong>{plant?.name}</strong> dan kembali ke halaman registrasi tanaman baru. Riwayat sensor dan penyiraman lama <strong>tidak akan dihapus</strong>.
+              </p>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  disabled={isDeleting}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.76rem', padding: '6px 12px' }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={async () => {
+                    setIsDeleting(true);
+                    setErrorMsg(null);
+                    try {
+                      await removePlantProfile();
+                      onClose();
+                    } catch (err) {
+                      setErrorMsg(err.message || 'Gagal menghapus profil tanaman');
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  }}
+                  className="btn btn-danger"
+                  style={{ fontSize: '0.76rem', padding: '6px 12px' }}
+                >
+                  {isDeleting ? 'Menghapus...' : 'Ya, Hapus & Ganti Tanaman'}
+                </button>
+              </div>
+            </div>
+          )}
         </form>
 
       </div>

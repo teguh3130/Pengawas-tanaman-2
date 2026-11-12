@@ -52,7 +52,7 @@ app.use(cors({
 }));
 
 // ─── Body Parser ──────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: false }));
 
 // ─── Health Check & Diagnostics ───────────────────────────────────────────────
@@ -76,6 +76,10 @@ app.get('/', (_req, res) => {
 
 app.get('/api/health', (_req, res) => {
   const fbConnected = isFirebaseInitialized();
+  const tokenAiConfigured = Boolean(
+    process.env.TOKENAI_API_KEY &&
+    process.env.TOKENAI_API_KEY !== 'your_tokenai_api_key_here'
+  );
   const geminiConfigured = Boolean(
     process.env.GEMINI_API_KEY &&
     process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here'
@@ -85,7 +89,8 @@ app.get('/api/health', (_req, res) => {
     status: 'ok',
     service: 'pengawas-tanaman-backend',
     firebase: fbConnected ? 'connected' : 'unconfigured',
-    gemini: geminiConfigured ? 'configured' : 'unconfigured',
+    gemini: (tokenAiConfigured || geminiConfigured) ? 'configured' : 'unconfigured',
+    aiProvider: tokenAiConfigured ? 'tokenai' : (geminiConfigured ? 'gemini' : 'unconfigured'),
     environment: process.env.NODE_ENV || 'development',
     time: new Date().toISOString(),
   });

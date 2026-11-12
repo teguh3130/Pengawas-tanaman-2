@@ -5,7 +5,7 @@
  * Controller konfigurasi tanaman dan parameter kebutuhan.
  */
 
-const { dbGet, dbSet, dbUpdate } = require('../services/firebase.service');
+const { dbGet, dbSet, dbUpdate, dbMultiUpdate } = require('../services/firebase.service');
 
 /**
  * POST /api/plant/configure
@@ -20,7 +20,7 @@ async function configurePlant(req, res, next) {
       name          : name.trim(),
       type          : type.trim(),
       variety       : variety?.trim() || '',
-      location      : location.trim(),
+      location      : location?.trim() || '-',
       startedAt     : startedAt ? Number(startedAt) : Date.now(),
       additionalInfo: additionalInfo?.trim() || '',
       createdAt     : Date.now(),
@@ -131,5 +131,69 @@ function buildDeepUpdate(existing, incoming) {
   return result;
 }
 
-module.exports = { configurePlant, getPlant, getRequirements, updateRequirements };
+/**
+ * POST /api/plant/requirements
+ * Simpan parameter kebutuhan yang telah diperiksa dan disetujui oleh user saat onboarding.
+ */
+async function saveApprovedRequirements(req, res, next) {
+  try {
+    const payload = {
+      ...req.body,
+      verifiedByUser: true,
+      updatedAt     : Date.now(),
+      updatedBy     : 'user_approved_onboarding',
+    };
+
+    await dbSet('/plantRequirements', payload);
+
+    // Sinkronkan threshold auto pump
+    if (payload.soilMoisture) {
+      const pumpAutoUpdate = {};
+      if (payload.soilMoisture.warning?.min !== undefined) {
+        pumpAutoUpdate.triggerMoistureMin = payload.soilMoisture.warning.min;
+      }
+      if (payload.soilMoisture.ideal?.max !== undefined) {
+        pumpAutoUpdate.targetMoistureMax = payload.soilMoisture.ideal.max;
+      }
+      if (Object.keys(pumpAutoUpdate).length > 0) {
+        await dbUpdate('/pump/auto', pumpAutoUpdate);
+      }
+    }
+
+    res.status(201).json({ success: true, data: payload });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * DELETE /api/plant
+ * Hapus profil tanaman aktif beserta requirements & analisis kesehatannya
+ * TANPA menghapus riwayat sensor (/sensorData) dan riwayat penyiraman (/pump/history).
+ */
+async function deletePlant(req, res, next) {
+  try {
+    await dbMultiUpdate({
+      '/plant': null,
+      '/plantRequirements': null,
+      '/plantHealth': null,
+    });
+
+    res.json({
+      success: true,
+      message: 'Profil tanaman berhasil dihapus. Riwayat sensor dan penyiraman tetap tersimpan.',
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = {
+  configurePlant,
+  getPlant,
+  getRequirements,
+  updateRequirements,
+  saveApprovedRequirements,
+  deletePlant,
+};
 

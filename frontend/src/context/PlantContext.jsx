@@ -9,6 +9,9 @@ export function PlantProvider({ children }) {
   const [deviceStatus, setDeviceStatus] = useState(null);
   const [plant, setPlant] = useState(null);
   const [requirements, setRequirements] = useState(null);
+  const [healthAnalysis, setHealthAnalysis] = useState(null);
+  const [plantLoaded, setPlantLoaded] = useState(false);
+  const [plantFetchError, setPlantFetchError] = useState(null);
   const [pump, setPump] = useState(null);
   const [historyData, setHistoryData] = useState([]);
   const [historyPeriod, setHistoryPeriod] = useState('24h');
@@ -76,24 +79,56 @@ export function PlantProvider({ children }) {
     }
   }, []);
 
-  // ─── Fetch Plant & Requirements ───────────────────────────────────────────
+  // ─── Fetch Plant, Requirements & Health Analysis ──────────────────────────
   const fetchPlantData = useCallback(async () => {
     try {
       const pRes = await api.getPlant();
       if (pRes?.success && pRes.data) {
         setPlant(pRes.data);
+      } else {
+        setPlant(null);
       }
+      setPlantFetchError(null);
     } catch (e) {
-      if (e.status !== 404) console.warn('Gagal membaca data tanaman:', e.message);
+      if (e.status === 404) {
+        setPlant(null);
+        setPlantFetchError(null);
+      } else {
+        console.warn('Gagal membaca data tanaman:', e.message);
+        setPlantFetchError(e.message || 'Gagal menghubungi server backend');
+      }
     }
 
     try {
       const rRes = await api.getRequirements();
       if (rRes?.success && rRes.data) {
         setRequirements(rRes.data);
+      } else {
+        setRequirements(null);
       }
     } catch (e) {
-      if (e.status !== 404) console.warn('Gagal membaca requirements:', e.message);
+      if (e.status === 404) {
+        setRequirements(null);
+      } else {
+        console.warn('Gagal membaca requirements:', e.message);
+      }
+    }
+
+    try {
+      const hRes = await api.getPlantHealth();
+      if (hRes?.success && hRes.data) {
+        setHealthAnalysis(hRes.data);
+      } else {
+        setHealthAnalysis(null);
+      }
+    } catch (e) {
+      if (e.status === 404) {
+        setHealthAnalysis(null);
+      } else {
+        console.warn('Gagal membaca analisis kesehatan:', e.message);
+      }
+    } finally {
+      setPlantLoaded(true);
     }
   }, []);
 
@@ -173,6 +208,57 @@ export function PlantProvider({ children }) {
     throw new Error(res?.error || 'Gagal mendapatkan analisis AI');
   };
 
+  const previewAiAnalysis = async (plantPayload) => {
+    const res = await api.analyzePlantWithAI(plantPayload, { preview: true });
+    if (res?.success && res.data) {
+      return res.data;
+    }
+    throw new Error(res?.error || 'Gagal mendapatkan analisis AI');
+  };
+
+  const completeOnboarding = async (plantForm, approvedRequirements) => {
+    const plantRes = await api.configurePlant(plantForm);
+    if (!plantRes?.success) {
+      throw new Error(plantRes?.error || 'Gagal menyimpan profil tanaman');
+    }
+
+    let savedReq = null;
+    if (approvedRequirements) {
+      const reqRes = await api.saveApprovedRequirements(approvedRequirements);
+      if (!reqRes?.success) {
+        throw new Error(reqRes?.error || 'Gagal menyimpan parameter kebutuhan tanaman');
+      }
+      savedReq = reqRes.data;
+    }
+
+    setPlant(plantRes.data);
+    setRequirements(savedReq);
+    setHealthAnalysis(null);
+    setPlantLoaded(true);
+    await fetchLiveStatus();
+    return { plant: plantRes.data, requirements: savedReq };
+  };
+
+  const removePlantProfile = async () => {
+    const res = await api.deletePlant();
+    if (res?.success) {
+      setPlant(null);
+      setRequirements(null);
+      setHealthAnalysis(null);
+      return res;
+    }
+    throw new Error(res?.error || 'Gagal menghapus profil tanaman');
+  };
+
+  const runHealthAnalysis = async () => {
+    const res = await api.analyzePlantHealth();
+    if (res?.success && res.data) {
+      setHealthAnalysis(res.data);
+      return res.data;
+    }
+    throw new Error(res?.error || 'Gagal menganalisis kesehatan tanaman');
+  };
+
   const saveRequirements = async (reqData) => {
     const res = await api.updateRequirements(reqData);
     if (res?.success) {
@@ -231,6 +317,9 @@ export function PlantProvider({ children }) {
     deviceStatus,
     plant,
     requirements,
+    healthAnalysis,
+    plantLoaded,
+    plantFetchError,
     pump,
     historyData,
     historyPeriod,
@@ -246,6 +335,10 @@ export function PlantProvider({ children }) {
     refreshAll,
     savePlantConfig,
     runAiAnalysis,
+    previewAiAnalysis,
+    completeOnboarding,
+    removePlantProfile,
+    runHealthAnalysis,
     saveRequirements,
     togglePump,
     changePumpMode,

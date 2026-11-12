@@ -108,11 +108,11 @@ async function postSensorData(req, res, next) {
     // Prune history maksimal sekali per 30 menit agar tidak membebani network
     pruneHistoryThrottled(MAX_HISTORY);
 
-    // Akumulasi durasi cahaya maksimal sekali per 30 detik
-    updateDailyLightThrottled(fields.lightLux, fields.timestamp);
-
     // ── 6. Periksa threshold dan evaluasi alerts (Cached 15s) ───────────────
     const requirements = await dbGetCached('/plantRequirements', 15000);
+
+    // Akumulasi durasi cahaya maksimal sekali per 30 detik
+    updateDailyLightThrottled(fields.lightLux, fields.timestamp, requirements);
     const alertsTriggered = checkThresholds(sensorRecord, requirements);
     updateAlertsOptimized(alertsTriggered).catch((err) =>
       console.error('⚠️  Gagal update alerts:', err.message)
@@ -150,7 +150,18 @@ async function getLatestSensor(req, res, next) {
     if (!latest) {
       return res.status(404).json({ success: false, error: 'Belum ada data sensor' });
     }
-    res.json({ success: true, data: latest });
+
+    const dateWIB = new Date(Date.now() + 7 * 3600 * 1000);
+    const dateKey = dateWIB.toISOString().slice(0, 10);
+    const dailyLight = await dbGetCached(`/sensorData/dailyLight/${dateKey}`, 15000);
+
+    res.json({
+      success: true,
+      data: {
+        ...latest,
+        dailyLight: dailyLight || null,
+      },
+    });
   } catch (err) {
     next(err);
   }
@@ -237,7 +248,7 @@ async function pruneHistoryThrottled(maxRecords) {
 }
 
 // ─── Throttled Daily Light (Maksimal 1 kali per 30 detik) ──────────────────────
-async function updateDailyLightThrottled(lightLux, timestamp) {
+async function updateDailyLightThrottled(lightLux, timestamp, requirements) {
   const now = Date.now();
   if (now - lastLightUpdateTimestamp < 30 * 1000) return;
   lastLightUpdateTimestamp = now;
@@ -251,13 +262,23 @@ async function updateDailyLightThrottled(lightLux, timestamp) {
 
     const INTERVAL_SEC = 30;
     const LIGHT_THRESHOLD_LUX = 100;
+    const idealMinLux = requirements?.light?.ideal?.minLux ?? 1000;
+    const idealMaxLux = requirements?.light?.ideal?.maxLux ?? Infinity;
+    const isIdealLight = lightLux >= idealMinLux && lightLux <= idealMaxLux;
 
     const prevDuration = existing?.durationAboveThresholdSec ?? 0;
     const newDuration  = lightLux >= LIGHT_THRESHOLD_LUX ? prevDuration + INTERVAL_SEC : prevDuration;
 
+    const prevIdealDuration = existing?.durationIdealSec ?? 0;
+    const newIdealDuration  = isIdealLight ? prevIdealDuration + INTERVAL_SEC : prevIdealDuration;
+
     await dbSet(path, {
       durationAboveThresholdSec: newDuration,
+      durationIdealSec         : newIdealDuration,
+      idealMinLux              : idealMinLux,
+      idealMaxLux              : Number.isFinite(idealMaxLux) ? idealMaxLux : null,
       date                     : dateKey,
+      updatedAt                : now,
     });
   } catch (err) {
     console.error('⚠️  Gagal update dailyLight:', err.message);

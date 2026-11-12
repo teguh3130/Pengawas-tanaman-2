@@ -65,7 +65,7 @@ const validatePlantConfig = [
     .isLength({ max: 100 }).withMessage('Varietas maksimal 100 karakter')
     .trim(),
   body('location')
-    .notEmpty().withMessage('Lokasi wajib diisi')
+    .optional({ values: 'falsy' })
     .isLength({ max: 200 }).withMessage('Lokasi maksimal 200 karakter')
     .trim(),
   body('startedAt')
@@ -102,23 +102,23 @@ const validatePumpMode = [
  * Validasi update batas parameter tanaman oleh user.
  */
 const validateRequirementsUpdate = [
-  body('soilMoisture.ideal.min').optional().isFloat({ min: 0, max: 100 }),
-  body('soilMoisture.ideal.max').optional().isFloat({ min: 0, max: 100 }),
-  body('soilMoisture.warning.min').optional().isFloat({ min: 0, max: 100 }),
-  body('soilMoisture.warning.max').optional().isFloat({ min: 0, max: 100 }),
-  body('temperature.ideal.min').optional().isFloat({ min: -50, max: 100 }),
-  body('temperature.ideal.max').optional().isFloat({ min: -50, max: 100 }),
-  body('temperature.warning.min').optional().isFloat({ min: -50, max: 100 }),
-  body('temperature.warning.max').optional().isFloat({ min: -50, max: 100 }),
-  body('airHumidity.ideal.min').optional().isFloat({ min: 0, max: 100 }),
-  body('airHumidity.ideal.max').optional().isFloat({ min: 0, max: 100 }),
-  body('airHumidity.warning.min').optional().isFloat({ min: 0, max: 100 }),
-  body('airHumidity.warning.max').optional().isFloat({ min: 0, max: 100 }),
-  body('light.ideal.minLux').optional().isFloat({ min: 0 }),
-  body('light.ideal.maxLux').optional().isFloat({ min: 0 }),
-  body('light.warning.minLux').optional().isFloat({ min: 0 }),
-  body('light.warning.maxLux').optional().isFloat({ min: 0 }),
-  body('light.dailyDurationHours').optional().isFloat({ min: 0, max: 24 }),
+  body('soilMoisture.ideal.min').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('soilMoisture.ideal.max').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('soilMoisture.warning.min').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('soilMoisture.warning.max').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('temperature.ideal.min').optional({ values: 'null' }).isFloat({ min: -50, max: 100 }),
+  body('temperature.ideal.max').optional({ values: 'null' }).isFloat({ min: -50, max: 100 }),
+  body('temperature.warning.min').optional({ values: 'null' }).isFloat({ min: -50, max: 100 }),
+  body('temperature.warning.max').optional({ values: 'null' }).isFloat({ min: -50, max: 100 }),
+  body('airHumidity.ideal.min').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('airHumidity.ideal.max').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('airHumidity.warning.min').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('airHumidity.warning.max').optional({ values: 'null' }).isFloat({ min: 0, max: 100 }),
+  body('light.ideal.minLux').optional({ values: 'null' }).isFloat({ min: 0 }),
+  body('light.ideal.maxLux').optional({ values: 'null' }).isFloat({ min: 0 }),
+  body('light.warning.minLux').optional({ values: 'null' }).isFloat({ min: 0 }),
+  body('light.warning.maxLux').optional({ values: 'null' }).isFloat({ min: 0 }),
+  body('light.dailyDurationHours').optional({ values: 'null' }).isFloat({ min: 0, max: 24 }),
   handleValidationErrors,
 ];
 

@@ -87,10 +87,10 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
         location: plant.location || '',
         additionalInfo: plant.additionalInfo || '',
       });
-      setSuccessMsg('Analisis Google Gemini AI berhasil diperbarui!');
+      setSuccessMsg('Analisis AI berhasil diperbarui!');
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) {
-      setErrorMsg(err.message || 'Gagal memanggil Gemini AI');
+      setErrorMsg(err.message || 'Gagal memanggil Asisten AI');
     } finally {
       setIsLoadingAi(false);
     }
@@ -271,7 +271,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
           </button>
           <div className="plant-detail-topbar-title">
             <h1>Detail &amp; Panduan Perawatan Tanaman</h1>
-            <p>Profil budidaya dan parameter monitoring Google Gemini AI</p>
+            <p>Profil budidaya dan parameter monitoring agronomi AI</p>
           </div>
         </div>
 
@@ -291,7 +291,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
             style={{ fontSize: '0.82rem', padding: '8px 14px' }}
           >
             <Sparkles size={14} />
-            <span>{isLoadingAi ? 'Memproses...' : 'Gemini AI'}</span>
+            <span>{isLoadingAi ? 'Memproses...' : 'Analisis AI'}</span>
           </button>
         </div>
       </div>
@@ -416,7 +416,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
         <div className="card-header" style={{ flexWrap: 'wrap', gap: '12px' }}>
           <div className="card-title">
             <Sparkles size={20} style={{ color: '#818cf8' }} />
-            <span>Rekomendasi Pemantauan Gemini AI</span>
+            <span>Rekomendasi Pemantauan AI</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -600,7 +600,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
 
                 {/* Footer Sumber & Disclaimer */}
                 <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px', fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <span>Dasar Rekomendasi: <strong>{requirements.source || 'Google Gemini AI'}</strong></span>
+                  <span>Dasar Rekomendasi: <strong>{requirements.source || 'Analisis AI Agronomi'}</strong></span>
                   {requirements.disclaimer && <span><em>Catatan: {requirements.disclaimer}</em></span>}
                 </div>
 
@@ -613,7 +613,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
                   Belum Ada Parameter Pemantauan
                 </h3>
                 <p style={{ fontSize: '0.825rem', maxWidth: '440px', margin: '0 auto 18px auto' }}>
-                  Gunakan Google Gemini AI untuk menganalisis kebutuhan tanaman Anda secara otomatis, atau masukkan batas parameter manual.
+                  Gunakan sistem AI untuk menganalisis kebutuhan tanaman Anda secara otomatis, atau masukkan batas parameter manual.
                 </p>
                 <button
                   onClick={handleStartAnalysis}
@@ -621,7 +621,7 @@ export function PlantDetailView({ onBack, onOpenPlantModal, onOpenAiModal }) {
                   className="btn btn-ai"
                 >
                   <Sparkles size={16} />
-                  <span>{isLoadingAi ? 'Memproses AI...' : 'Minta Analisis Gemini AI Sekarang'}</span>
+                  <span>{isLoadingAi ? 'Memproses AI...' : 'Minta Analisis AI Sekarang'}</span>
                 </button>
               </div>
             )}

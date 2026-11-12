@@ -62,6 +62,24 @@ export function SensorOverview() {
   // 4. Intensitas Cahaya (BH1750)
   const luxVal = sensorData?.lightLux ?? null;
   const lightReq = requirements?.light;
+  const targetHours = lightReq?.dailyDurationHours ?? 8;
+  const dailyLight = sensorData?.dailyLight;
+  const lightSecToday = dailyLight?.durationIdealSec ?? dailyLight?.durationAboveThresholdSec ?? null;
+
+  function formatLightDuration(sec) {
+    if (sec === null || sec === undefined || Number.isNaN(Number(sec))) return '--';
+    const totalSec = Math.max(0, Math.floor(Number(sec)));
+    if (totalSec === 0) return '0 mnt';
+    if (totalSec < 60) return '< 1 mnt';
+    const hours = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    if (hours === 0) return `${mins} mnt`;
+    return mins > 0 ? `${hours}j ${mins}m` : `${hours} jam`;
+  }
+
+  const targetSec = targetHours * 3600;
+  const lightGoalReached = lightSecToday !== null && lightSecToday >= targetSec;
+
   let luxStatus = { label: 'Optimal', statusClass: 'ok', percent: 50 };
   if (luxVal === null || luxVal === undefined) {
     luxStatus = { label: 'Standby', statusClass: 'waiting', percent: 0 };
@@ -219,8 +237,29 @@ export function SensorOverview() {
         </div>
 
         <div className="metric-footer">
-          <span>Target: {lightReq?.dailyDurationHours ? `${lightReq.dailyDurationHours} jam/hari` : '6–8 jam'}</span>
+          <span>
+            Target: {targetHours} jam/hari
+            {lightReq?.ideal?.minLux != null ? ` (${Number(lightReq.ideal.minLux).toLocaleString('id-ID')}+ Lux)` : ''}
+          </span>
           <span>BH1750 (I2C 0x23)</span>
+        </div>
+        <div
+          style={{
+            marginTop: '6px',
+            paddingTop: '6px',
+            borderTop: '1px dashed var(--border-subtle)',
+            fontSize: '0.7rem',
+            color: lightGoalReached ? 'var(--status-normal)' : 'var(--text-muted)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <span>Cahaya ideal hari ini:</span>
+          <strong className="mono" style={{ color: lightGoalReached ? 'var(--status-normal)' : 'var(--text-secondary)' }}>
+            {formatLightDuration(lightSecToday)} / {targetHours} jam
+          </strong>
         </div>
       </div>
 

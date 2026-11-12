@@ -94,8 +94,21 @@ export async function configurePlant(plantData) {
   });
 }
 
+export async function deletePlant() {
+  return request('/api/plant', {
+    method: 'DELETE',
+  });
+}
+
 export async function getRequirements() {
   return request('/api/plant/requirements');
+}
+
+export async function saveApprovedRequirements(requirementsData) {
+  return request('/api/plant/requirements', {
+    method: 'POST',
+    body: requirementsData,
+  });
 }
 
 export async function updateRequirements(requirementsData) {
@@ -106,11 +119,22 @@ export async function updateRequirements(requirementsData) {
 }
 
 // ─── Gemini AI Integration ───────────────────────────────────────────────────
-export async function analyzePlantWithAI(plantData) {
+export async function analyzePlantWithAI(plantData, options = {}) {
   return request('/api/ai/analyze', {
     method: 'POST',
-    body: plantData,
+    body: { ...plantData, preview: Boolean(options.preview) },
     timeout: 30000, // AI prompt mungkin butuh waktu hingga 30 detik
+  });
+}
+
+export async function getPlantHealth() {
+  return request('/api/ai/health-analysis');
+}
+
+export async function analyzePlantHealth() {
+  return request('/api/ai/health-analysis', {
+    method: 'POST',
+    timeout: 30000,
   });
 }
 
@@ -166,9 +190,13 @@ export default {
   getSensorHistory,
   getPlant,
   configurePlant,
+  deletePlant,
   getRequirements,
+  saveApprovedRequirements,
   updateRequirements,
   analyzePlantWithAI,
+  getPlantHealth,
+  analyzePlantHealth,
   getPumpStatus,
   sendPumpCommand,
   setPumpMode,

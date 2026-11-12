@@ -4,8 +4,18 @@
     "module": "commonjs",
     "allowJs": true,
     "checkJs": false,
+    "noEmit": true,
     "skipLibCheck": true,
     "moduleResolution": "node"
-  }
+  },
+  "include": [
+    "index.js",
+    "src/**/*",
+    "test/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "public"
+  ]
 }
 

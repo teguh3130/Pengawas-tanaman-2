@@ -27,7 +27,7 @@ export function PlantSummaryCard({ onOpenPlantModal, onOpenAiModal, onOpenDetail
           style={{ padding: '4px 10px', fontSize: '0.75rem' }}
         >
           <Settings2 size={13} />
-          <span>Konfigurasi</span>
+          <span>Ubah Tanaman</span>
         </button>
       </div>
 
@@ -71,7 +71,7 @@ export function PlantSummaryCard({ onOpenPlantModal, onOpenAiModal, onOpenDetail
               }}
             >
               <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
-                Batas Toleransi Ideal (Gemini AI Guard)
+                Batas Toleransi Ideal (Target Pemantauan)
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center' }}>
                 <div style={{ padding: '6px 4px', background: 'var(--bg-card)', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>

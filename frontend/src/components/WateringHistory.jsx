@@ -2,6 +2,35 @@ import React from 'react';
 import { usePlant } from '../context/PlantContext';
 import { History, Droplets } from 'lucide-react';
 
+function formatTriggerReason(reason) {
+  if (!reason) return 'Pemicu Sistem';
+  const map = {
+    relay_off_reported: 'Penyiraman Selesai',
+    manual_on: 'Dinyalakan Manual',
+    manual_off: 'Dimatikan Manual',
+    auto_on: 'Otomatis (Tanah Kering)',
+    auto_moisture_low: 'Otomatis (Tanah Kering)',
+    auto_off: 'Otomatis (Target Tercapai)',
+    auto_target_reached: 'Otomatis (Target Tercapai)',
+    safety_cutoff: 'Cutoff Keamanan',
+    failsafe: 'Failsafe Perangkat',
+  };
+  if (map[reason]) return map[reason];
+  return String(reason)
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatDuration(sec) {
+  if (sec === null || sec === undefined) return 'Berjalan';
+  const num = Number(sec);
+  if (!Number.isFinite(num) || num <= 0) return 'Berjalan';
+  if (num < 60) return `${Math.round(num)} dtk`;
+  const m = Math.floor(num / 60);
+  const s = Math.round(num % 60);
+  return s > 0 ? `${m}m ${s}d` : `${m} mnt`;
+}
+
 export function WateringHistory() {
   const { wateringHistory } = usePlant();
 
@@ -10,7 +39,7 @@ export function WateringHistory() {
       <div className="card-header">
         <div className="card-title">
           <History size={16} style={{ color: 'var(--plant-green)' }} />
-          <span>Log Aktivitas Irigasi & Aktuator</span>
+          <span>Log Aktivitas Irigasi &amp; Aktuator</span>
         </div>
         <span className="mono" style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
           {wateringHistory.length} Sesi Tercatat
@@ -33,15 +62,29 @@ export function WateringHistory() {
           </div>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
+        <div
+          style={{
+            overflowX: 'auto',
+            overflowY: 'auto',
+            maxHeight: '290px',
+            borderRadius: 'var(--radius-xs)',
+          }}
+        >
           <table className="data-table">
-            <thead>
+            <thead
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 2,
+                background: 'var(--bg-card)',
+              }}
+            >
               <tr>
-                <th>Timestamp</th>
+                <th>Waktu</th>
                 <th>Mode</th>
                 <th>Durasi</th>
-                <th>Pemicu / Alasan</th>
-                <th>Kondisi Tanah</th>
+                <th>Keterangan</th>
+                <th>Tanah Akhir</th>
               </tr>
             </thead>
             <tbody>
@@ -53,38 +96,41 @@ export function WateringHistory() {
                     hour: '2-digit',
                     minute: '2-digit',
                   })
-                  : '-';
+                  : '—';
                 const isAuto = item.mode === 'auto';
+                const hasSoilAfter = item.soilAfter !== null && item.soilAfter !== undefined && !Number.isNaN(Number(item.soilAfter));
+
                 return (
                   <tr key={item.key || idx}>
-                    <td className="mono" style={{ color: 'var(--text-primary)' }}>{dateStr}</td>
+                    <td className="mono" style={{ color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                      {dateStr}
+                    </td>
                     <td>
                       <span
                         style={{
-                          fontSize: '0.6875rem',
+                          fontSize: '0.68rem',
                           fontWeight: 700,
                           textTransform: 'uppercase',
                           letterSpacing: '0.04em',
-                          padding: '2px 6px',
+                          padding: '2px 7px',
                           borderRadius: 'var(--radius-xs)',
                           background: isAuto ? 'var(--status-info-bg)' : 'var(--plant-green-muted)',
                           color: isAuto ? 'var(--status-info)' : 'var(--plant-green)',
                           border: `1px solid ${isAuto ? 'var(--status-info-border)' : 'var(--plant-green-border)'}`,
+                          display: 'inline-block',
                         }}
                       >
                         {item.mode || 'manual'}
                       </span>
                     </td>
-                    <td className="mono">
-                      {item.durationSec ? `${item.durationSec}s` : 'Aktif'}
+                    <td className="mono" style={{ whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+                      {formatDuration(item.durationSec)}
                     </td>
-                    <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      {item.triggerReason || 'Operator Trigger'}
+                    <td style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                      {formatTriggerReason(item.triggerReason)}
                     </td>
-                    <td className="mono" style={{ color: 'var(--soil-cyan)', fontWeight: 600 }}>
-                      {item.soilAfter !== null && item.soilAfter !== undefined
-                        ? `${item.soilAfter}%`
-                        : '-'}
+                    <td className="mono" style={{ color: hasSoilAfter ? 'var(--soil-cyan)' : 'var(--text-muted)', fontWeight: 600 }}>
+                      {hasSoilAfter ? `${Number(item.soilAfter).toFixed(1)}%` : '—'}
                     </td>
                   </tr>
                 );

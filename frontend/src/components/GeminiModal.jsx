@@ -68,10 +68,10 @@ export function GeminiModal({ isOpen, onClose }) {
         location: plant.location || '',
         additionalInfo: plant.additionalInfo || '',
       });
-      setSuccessMsg('Analisis Google Gemini AI berhasil diperoleh dan disimpan!');
+      setSuccessMsg('Analisis AI berhasil diperoleh dan disimpan!');
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) {
-      setErrorMsg(err.message || 'Gagal memanggil Gemini AI');
+      setErrorMsg(err.message || 'Gagal memanggil Asisten AI');
     } finally {
       setIsLoadingAi(false);
     }
@@ -155,7 +155,7 @@ export function GeminiModal({ isOpen, onClose }) {
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h2 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: 700 }}>Rekomendasi Gemini AI</h2>
+                <h2 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: 700 }}>Rekomendasi Asisten AI</h2>
                 <span
                   style={{
                     fontSize: '0.7rem',
@@ -364,7 +364,7 @@ export function GeminiModal({ isOpen, onClose }) {
 
                 {/* Disclaimer */}
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px' }}>
-                  <span>Sumber: {requirements.source || 'Gemini AI'}</span>
+                  <span>Sumber: {requirements.source || 'Analisis AI Agronomi'}</span>
                   {requirements.disclaimer && <span> • <em>Catatan: {requirements.disclaimer}</em></span>}
                 </div>
 
@@ -377,7 +377,7 @@ export function GeminiModal({ isOpen, onClose }) {
                   Belum Ada Rekomendasi AI
                 </div>
                 <div style={{ fontSize: '0.825rem', maxWidth: '420px', margin: '0 auto 20px auto' }}>
-                  Klik tombol di bawah agar Google Gemini AI menganalisis kebutuhan ideal kelembapan, suhu, dan cahaya tanaman Anda secara ilmiah.
+                  Klik tombol di bawah agar sistem AI menganalisis kebutuhan ideal kelembapan, suhu, dan cahaya tanaman Anda secara ilmiah.
                 </div>
                 <button
                   type="button"
@@ -386,7 +386,7 @@ export function GeminiModal({ isOpen, onClose }) {
                   className="btn btn-ai"
                 >
                   <Sparkles size={16} />
-                  <span>{isLoadingAi ? 'Memproses Analisis AI...' : 'Dapatkan Analisis Gemini AI Sekarang'}</span>
+                  <span>{isLoadingAi ? 'Memproses Analisis AI...' : 'Dapatkan Analisis AI Sekarang'}</span>
                 </button>
               </div>
             )}

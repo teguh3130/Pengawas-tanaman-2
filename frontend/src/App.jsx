@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { PlantProvider } from './context/PlantContext';
+import { PlantProvider, usePlant } from './context/PlantContext';
 import Navbar from './components/Navbar';
 import AlertBanner from './components/AlertBanner';
 import SensorOverview from './components/SensorOverview';
@@ -12,27 +12,63 @@ import WateringHistory from './components/WateringHistory';
 import PlantModal from './components/PlantModal';
 import GeminiModal from './components/GeminiModal';
 import PlantDetailView from './components/PlantDetailView';
+import PlantOnboarding from './components/PlantOnboarding';
+import PlantHealthPanel from './components/PlantHealthPanel';
 
 function DashboardContent() {
+  const { plant, plantLoaded, plantFetchError, isLoading, refreshAll, isRefreshing } = usePlant();
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'detail'
   const [isPlantModalOpen, setIsPlantModalOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
+  // Jika profil tanaman dihapus, pastikan kembali ke view dashboard (onboarding)
+  useEffect(() => {
+    if (plantLoaded && !plant) {
+      setCurrentView('dashboard');
+      setIsPlantModalOpen(false);
+      setIsAiModalOpen(false);
+    }
+  }, [plant, plantLoaded]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
 
       {/* Top Navigation */}
       <Navbar
-        onOpenPlantModal={() => setIsPlantModalOpen(true)}
-        onOpenAiModal={() => setIsAiModalOpen(true)}
-        onOpenPlantDetail={() => setCurrentView('detail')}
+        onOpenPlantModal={plant ? () => setIsPlantModalOpen(true) : undefined}
+        onOpenAiModal={plant ? () => setIsAiModalOpen(true) : undefined}
+        onOpenPlantDetail={plant ? () => setCurrentView('detail') : undefined}
       />
 
       {/* Main Body */}
       <main style={{ flex: 1, padding: '24px 0 40px 0' }}>
         <div className="container">
 
-          {currentView === 'detail' ? (
+          {(!plantLoaded || isLoading) ? (
+            <div className="card" style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)' }}>
+              Memuat konfigurasi sistem pengawas tanaman...
+            </div>
+          ) : (plantFetchError && !plant) ? (
+            <div className="card" style={{ maxWidth: '540px', margin: '24px auto', textAlign: 'center', padding: '32px 24px' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--status-danger)', marginBottom: '8px' }}>
+                Gagal Terhubung ke Server Backend
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '18px', lineHeight: 1.5 }}>
+                {plantFetchError}. Pastikan backend Node.js berjalan dan URL API pada konfigurasi frontend sudah sesuai.
+              </p>
+              <button
+                type="button"
+                onClick={refreshAll}
+                disabled={isRefreshing}
+                className="btn btn-primary"
+              >
+                {isRefreshing ? 'Menghubungkan...' : 'Coba Lagi'}
+              </button>
+            </div>
+          ) : !plant ? (
+            /* Wajib Onboarding jika belum ada profil tanaman aktif */
+            <PlantOnboarding />
+          ) : currentView === 'detail' ? (
             /* Halaman Detail Tanaman & Panduan Gemini AI */
             <PlantDetailView
               onBack={() => setCurrentView('dashboard')}
@@ -51,8 +87,9 @@ function DashboardContent() {
               {/* 2-Column Responsive Dashboard Layout */}
               <div className="dashboard-grid">
 
-                {/* Left Column: Charts & Watering History */}
+                {/* Left Column: Health Analysis, Charts & Watering History */}
                 <div>
+                  <PlantHealthPanel />
                   <SensorCharts />
                   <WateringHistory />
                 </div>
@@ -92,7 +129,7 @@ function DashboardContent() {
             Sistem Pengawas Tanaman (Agricultural IoT & AI Telemetry)
           </p>
           <p style={{ fontSize: '0.7rem', marginTop: '2px', color: 'var(--text-muted)' }}>
-            ESP32 MicroPython • Firebase Realtime Database • Google Gemini AI Engine
+            ESP32 MicroPython • Firebase Realtime Database • AI Agronomi Engine
           </p>
         </div>
       </footer>
